@@ -3,9 +3,11 @@
 import type { Metadata } from "next";
 import PillarTable from "@/components/result/PillarTable";
 import OhaengChart from "@/components/result/OhaengChart";
+import DaeunSeunChart from "@/components/result/DaeunSeunChart";
+import CategoryAccordion from "@/components/result/CategoryAccordion";
+import ShareCard from "@/components/result/ShareCard";
 import Card from "@/components/ui/Card";
 import AdSlot from "@/components/layout/AdSlot";
-import Icon from "@/components/ui/Icon";
 import { dummySaju, dummyInterpretation } from "@/lib/dummy/saju";
 
 export const metadata: Metadata = {
@@ -100,13 +102,21 @@ export default function ResultPage({
         </Card>
       </div>
 
-      {/* Phase 4 예정: 대운/세운 차트 · 분야별 심화 · 공유 카드 */}
-      <Card className="border-dashed text-center">
-        <p className="flex items-center justify-center gap-2 text-sm text-sub">
-          <Icon name="chart" size={18} />
-          대운·세운 차트, 분야별 심화 해석, 공유 카드는 다음 단계에서 추가됩니다.
-        </p>
+      {/* 6) 대운/세운 차트 ("인생 곡선") */}
+      <Card title="대운·세운 흐름" desc="시기별 기운의 변화">
+        <DaeunSeunChart daeun={s.daeun} seun={s.seun} />
       </Card>
+
+      {/* 7) 분야별 심화 해석 (5종 아코디언) */}
+      <Card title="분야별 심화 해석" desc="궁금한 분야를 눌러보세요">
+        <CategoryAccordion />
+      </Card>
+
+      {/* 8) 공유 카드 */}
+      <ShareCard
+        pillars={s.pillars}
+        summaryLine="정화(丁火) 일간 · 꾸준함이 강점인 사주"
+      />
 
       {/* 광고 정책: 결과 페이지 하단 배너 1개 */}
       <AdSlot slot="result-bottom" />
