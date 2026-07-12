@@ -1,11 +1,12 @@
 "use client";
 
-// 분야별 심화 해석 — 버튼 5개(이직/사랑/금전/건강/지인), 클릭 시 아코디언 펼침.
-// 백엔드 연동 전이므로 "백그라운드 준비 → 즉시 표시 / 미완료 시 스피너" 흐름을 시뮬레이션.
-// PART 2에서 실제 /api/interpret 병렬 프리페치로 교체.
-import { useEffect, useRef, useState } from "react";
+// 분야별 심화 해석 — 버튼 5개(이직/사랑/금전/건강/지인).
+// 변경: 결과 로딩 시 전체 사전 생성(X) → 사용자가 버튼을 클릭하는 순간에만
+//       해당 카테고리 하나를 /api/interpret로 생성한다.
+//   클릭 → (이미 받은 값 있으면 즉시 표시) → 없으면 API 호출 → 스피너 → 결과 표시
+import { useState } from "react";
 import Icon from "@/components/ui/Icon";
-import { dummyCategoryText } from "@/lib/dummy/saju";
+import type { SajuCompact } from "@/lib/prompt";
 import type { Category } from "@/lib/types";
 
 const categories: { key: Category; desc: string }[] = [
@@ -16,33 +17,54 @@ const categories: { key: Category; desc: string }[] = [
   { key: "지인", desc: "인간관계 흐름" },
 ];
 
-export default function CategoryAccordion() {
+type Status = "idle" | "loading" | "done" | "error";
+interface CatState {
+  status: Status;
+  text?: string;
+  error?: string;
+}
+
+export default function CategoryAccordion({ saju }: { saju: SajuCompact }) {
   const [open, setOpen] = useState<Category | null>(null);
-  // 각 카테고리 해석의 준비 상태 (백그라운드 프리페치 시뮬레이션)
-  const [ready, setReady] = useState<Record<string, boolean>>({});
-  const started = useRef(false);
+  // 카테고리별 상태(클라이언트 캐시 역할 — 한 번 받은 해석은 다시 요청하지 않음)
+  const [states, setStates] = useState<Record<string, CatState>>({});
 
-  // 결과 페이지 진입 시 5개 해석을 백그라운드에서 순차 준비(병렬 프리페치 흉내)
-  useEffect(() => {
-    if (started.current) return;
-    started.current = true;
-    categories.forEach((c, i) => {
-      // 실제로는 fetch('/api/interpret'). 여기선 지연으로 준비 완료를 흉내낸다.
-      const t = setTimeout(
-        () => setReady((r) => ({ ...r, [c.key]: true })),
-        700 + i * 500
-      );
-      return () => clearTimeout(t);
-    });
-  }, []);
+  // 클릭 시점에만 호출. 이미 받은 값이 있으면 재요청하지 않는다.
+  const fetchCategory = async (key: Category) => {
+    setStates((s) => ({ ...s, [key]: { status: "loading" } }));
+    try {
+      const res = await fetch("/api/interpret", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ saju, category: key }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.text) {
+        throw new Error(data.error || "해석을 불러오지 못했어요.");
+      }
+      setStates((s) => ({ ...s, [key]: { status: "done", text: data.text } }));
+    } catch (e) {
+      setStates((s) => ({
+        ...s,
+        [key]: { status: "error", error: e instanceof Error ? e.message : "오류" },
+      }));
+    }
+  };
 
-  const toggle = (key: Category) => setOpen((cur) => (cur === key ? null : key));
+  const toggle = (key: Category) => {
+    setOpen((cur) => (cur === key ? null : key));
+    // 펼치는 동작이고, 아직 요청 전(idle/error)일 때만 호출
+    const st = states[key]?.status;
+    if (open !== key && (st === undefined || st === "error")) {
+      fetchCategory(key);
+    }
+  };
 
   return (
     <div className="space-y-2">
       {categories.map((c) => {
         const isOpen = open === c.key;
-        const isReady = ready[c.key];
+        const st = states[c.key] ?? { status: "idle" as Status };
         return (
           <div key={c.key} className="overflow-hidden rounded-btn border border-border">
             <button
@@ -64,15 +86,26 @@ export default function CategoryAccordion() {
 
             {isOpen && (
               <div className="border-t border-border px-4 py-3">
-                {isReady ? (
-                  <p
-                    className="text-sm leading-relaxed text-text"
-                    // 건강 카테고리 등 일부 <b> 강조 포함
-                    dangerouslySetInnerHTML={{ __html: dummyCategoryText[c.key] }}
-                  />
-                ) : (
+                {st.status === "loading" && (
                   <div className="flex items-center gap-2 py-2 text-sm text-sub">
-                    <Spinner /> 해석을 준비하고 있어요…
+                    <Spinner /> 해석을 생성하고 있어요…
+                  </div>
+                )}
+                {st.status === "done" && (
+                  <p className="whitespace-pre-line text-sm leading-relaxed text-text">
+                    {st.text}
+                  </p>
+                )}
+                {st.status === "error" && (
+                  <div className="py-1 text-sm">
+                    <p className="text-red-600">{st.error}</p>
+                    <button
+                      type="button"
+                      onClick={() => fetchCategory(c.key)}
+                      className="mt-2 text-primary underline"
+                    >
+                      다시 시도
+                    </button>
                   </div>
                 )}
               </div>
@@ -84,14 +117,10 @@ export default function CategoryAccordion() {
   );
 }
 
-// 간단한 로딩 스피너 (라인 아이콘 톤)
+// 간단한 로딩 스피너
 function Spinner() {
   return (
-    <svg
-      className="h-4 w-4 animate-spin text-primary"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
+    <svg className="h-4 w-4 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2.5" opacity="0.2" />
       <path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
     </svg>

@@ -19,8 +19,8 @@ import type { Category } from "@/lib/types";
 
 export const runtime = "nodejs";
 
-// 해석 생성 모델 — 캐싱 전제의 대량 생성이라 Sonnet 계열(비용 효율) 사용.
-const MODEL = "claude-sonnet-5";
+// 해석 생성 모델 — 캐싱 전제의 대량 생성이라 비용 효율적인 Haiku 사용.
+const MODEL = "claude-haiku-4-5-20251001";
 const CATEGORIES: Category[] = ["이직", "사랑", "금전", "건강", "지인"];
 
 interface InterpretBody {

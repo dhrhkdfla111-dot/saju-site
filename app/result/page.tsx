@@ -58,6 +58,20 @@ export default function ResultPage({
       ? `${searchParams.hour}시${searchParams.minute ? ` ${searchParams.minute}분` : ""}`
       : "시각 미상";
 
+  // /api/interpret로 넘길 사주 컴팩트(원국+오행+성별). 클릭 시 카테고리 생성에 사용.
+  const sajuCompact = {
+    pillars: s.pillars.map((p) => ({
+      label: p.label,
+      cheongan: p.cheongan,
+      jiji: p.jiji,
+      sipseong: p.sipseong,
+    })),
+    ilgan: s.pillars.find((p) => p.label === "일주")?.cheongan,
+    ohaeng: Object.fromEntries(Object.entries(s.ohaeng)) as Record<string, number>,
+    gender,
+    hourUnknown,
+  };
+
   return (
     <div className="space-y-6">
       {/* 입력 요약 헤더 */}
@@ -130,9 +144,9 @@ export default function ResultPage({
         <DaeunSeunChart daeun={s.daeun} seun={s.seun} />
       </Card>
 
-      {/* 7) 분야별 심화 해석 (5종 아코디언) */}
+      {/* 7) 분야별 심화 해석 (5종 아코디언) — 클릭 시 해당 카테고리만 생성 */}
       <Card title="분야별 심화 해석" desc="궁금한 분야를 눌러보세요">
-        <CategoryAccordion />
+        <CategoryAccordion saju={sajuCompact} />
       </Card>
 
       {/* 8) 공유 카드 */}
