@@ -1,0 +1,115 @@
+// /result — 사주 결과 페이지.
+// 현재는 더미 데이터 기반(백엔드 연동 전). 쿼리로 받은 입력값은 헤더 표시에 사용.
+import type { Metadata } from "next";
+import PillarTable from "@/components/result/PillarTable";
+import OhaengChart from "@/components/result/OhaengChart";
+import Card from "@/components/ui/Card";
+import AdSlot from "@/components/layout/AdSlot";
+import Icon from "@/components/ui/Icon";
+import { dummySaju, dummyInterpretation } from "@/lib/dummy/saju";
+
+export const metadata: Metadata = {
+  title: "사주 결과 — 명식·오행·해석",
+  description: "원국 명식과 오행 분포, 개인화된 사주 해석 결과를 확인하세요.",
+};
+
+type SearchParams = { [k: string]: string | undefined };
+
+export default function ResultPage({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  // 입력 요약 (쿼리 우선, 없으면 더미)
+  const s = dummySaju;
+  const year = searchParams.year ?? String(s.input.year);
+  const month = searchParams.month ?? String(s.input.month);
+  const day = searchParams.day ?? String(s.input.day);
+  const gender = searchParams.gender ?? s.input.gender;
+  const calendar = searchParams.calendar === "lunar" ? "음력" : "양력";
+  const hourUnknown = searchParams.hour === undefined;
+  const time =
+    searchParams.hour !== undefined
+      ? `${searchParams.hour}시${searchParams.minute ? ` ${searchParams.minute}분` : ""}`
+      : "시각 미상";
+
+  return (
+    <div className="space-y-6">
+      {/* 입력 요약 헤더 */}
+      <section>
+        <h1 className="text-xl font-bold">사주 결과</h1>
+        <p className="mt-1 text-sm text-sub">
+          {calendar} {year}년 {month}월 {day}일 · {time} · {gender}
+        </p>
+      </section>
+
+      {/* 1) 총평 (성격/기질) — 최상단 */}
+      <Card title="총평" desc="성격과 기질">
+        <p className="text-[15px] leading-relaxed text-text">
+          {dummyInterpretation.summary}
+        </p>
+      </Card>
+
+      {/* 2) 오늘의 총운/재물운/애정운 요약 */}
+      <Card title="오늘의 운세 요약">
+        <dl className="space-y-3">
+          {Object.entries(dummyInterpretation.today).map(([k, v]) => (
+            <div key={k}>
+              <dt className="text-sm font-bold text-primary">{k}</dt>
+              <dd className="mt-0.5 text-sm leading-relaxed text-text">{v}</dd>
+            </div>
+          ))}
+        </dl>
+      </Card>
+
+      {/* 3) 원국 명식표 */}
+      <Card title="원국 명식" desc="연·월·일·시 사주 여덟 글자">
+        <PillarTable pillars={s.pillars} hourUnknown={hourUnknown} />
+      </Card>
+
+      {/* 4) 오행 분포 */}
+      <Card title="오행 분포" desc="목·화·토·금·수 균형">
+        <OhaengChart data={s.ohaeng} />
+      </Card>
+
+      {/* 5) 십성 & 공망 */}
+      <div className="grid gap-6 sm:grid-cols-2">
+        <Card title="십성">
+          <div className="flex flex-wrap gap-2">
+            {s.sipseong.map((t) => (
+              <span
+                key={t}
+                className="rounded-full bg-surface px-3 py-1 text-sm text-text"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        </Card>
+        <Card title="공망" desc="비어 있는 기운">
+          <div className="flex flex-wrap gap-2">
+            {s.gongmang.map((t) => (
+              <span
+                key={t}
+                className="rounded-full border border-border px-3 py-1 text-sm text-sub"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      {/* Phase 4 예정: 대운/세운 차트 · 분야별 심화 · 공유 카드 */}
+      <Card className="border-dashed text-center">
+        <p className="flex items-center justify-center gap-2 text-sm text-sub">
+          <Icon name="chart" size={18} />
+          대운·세운 차트, 분야별 심화 해석, 공유 카드는 다음 단계에서 추가됩니다.
+        </p>
+      </Card>
+
+      {/* 광고 정책: 결과 페이지 하단 배너 1개 */}
+      <AdSlot slot="result-bottom" />
+    </div>
+  );
+}
