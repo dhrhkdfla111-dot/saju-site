@@ -10,12 +10,35 @@ import Card from "@/components/ui/Card";
 import AdSlot from "@/components/layout/AdSlot";
 import { dummySaju, dummyInterpretation } from "@/lib/dummy/saju";
 
-export const metadata: Metadata = {
-  title: "사주 결과 — 명식·오행·해석",
-  description: "원국 명식과 오행 분포, 개인화된 사주 해석 결과를 확인하세요.",
-};
-
 type SearchParams = { [k: string]: string | undefined };
+
+// 동적 메타 + OG 이미지 연결 (공유 카드용)
+export function generateMetadata({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}): Metadata {
+  const { year, month, day } = searchParams;
+  const dateLabel =
+    year && month && day ? `${year}.${month}.${day}` : "";
+  // 명식 8글자(더미) → OG route 파라미터
+  const p = dummySaju.pillars
+    .flatMap((pi) => [pi.cheongan, pi.jiji])
+    .join(",");
+  const ogUrl = `/api/og?p=${encodeURIComponent(p)}${
+    dateLabel ? `&d=${encodeURIComponent(dateLabel)}` : ""
+  }`;
+  return {
+    title: "사주 결과 — 명식·오행·해석",
+    description: "원국 명식과 오행 분포, 개인화된 사주 해석 결과를 확인하세요.",
+    openGraph: {
+      title: "내 사주 결과",
+      description: "정화(丁火) 일간 · 명식과 오행, 대운·세운 해석",
+      images: [{ url: ogUrl, width: 1200, height: 630 }],
+    },
+    twitter: { card: "summary_large_image", images: [ogUrl] },
+  };
+}
 
 export default function ResultPage({
   searchParams,
