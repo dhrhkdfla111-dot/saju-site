@@ -49,17 +49,17 @@ body {{ background:{CW['bg']}; }}
 .tabs .t.active {{ color:#fff; background:{CW['nav_active']}; }}
 
 /* option 2 — floating pills */
-.pills {{ display:flex; gap:12px; padding:20px 28px; justify-content:center; }}
-.pills .p {{ display:flex; align-items:center; gap:8px; padding:12px 20px; border-radius:999px;
-  background:{CW['bg_soft']}; color:{CW['nav_ink']}; text-decoration:none; font-size:15px;
-  font-weight:500; border:1px solid {CW['line']}; }}
+.pills {{ display:flex; gap:12px; padding:22px 28px; justify-content:center; }}
+.pills .p {{ display:flex; align-items:center; gap:8px; padding:11px 20px; border-radius:26px;
+  white-space:nowrap; background:{CW['bg_soft']}; color:{CW['nav_ink']}; text-decoration:none;
+  font-size:15px; font-weight:500; border:1px solid {CW['line']}; }}
 .pills .p .nav-icon {{ width:20px; height:20px; }}
 .pills .p.active {{ background:{CW['blue']}; color:#fff; border-color:{CW['blue']}; }}
 
 /* option 3 — minimal icons, label on active only */
 .min {{ display:flex; gap:34px; padding:24px 40px; align-items:center; }}
 .min .m {{ display:flex; align-items:center; gap:8px; color:{CW['ink_faint']}; text-decoration:none;
-  font-size:15px; font-weight:600; }}
+  font-size:15px; font-weight:600; white-space:nowrap; }}
 .min .m.active {{ color:{CW['blue_deep']}; }}
 .min .m.active .nav-icon {{ color:{CW['blue_deep']}; }}
 """
