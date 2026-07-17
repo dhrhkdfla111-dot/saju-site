@@ -204,17 +204,22 @@ def build_modes():
 # ===========================================================================
 def build_tracker():
     W, H = 1680, 760
-    RED = "#D98A82"      # muted, generic — not disparaging any brand
+    RED = "#CF5F55"       # clear, generic red — not disparaging any brand
+    GREYX = "#9BA0A6"     # neutral grey (no green cast) for the "done" checks
     days = ["M", "T", "W", "T", "F", "S", "S"]
     stick = C.ASSET_DIR / "stickers"
 
-    # LEFT: the usual guilt tracker (X marks, broken streak)
-    xmark = (f'<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="{RED}" '
-             f'stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>')
-    checkg = (f'<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="#9aa4ac" '
+    # LEFT: the usual guilt tracker — neutral-grey checks, hard red X on misses,
+    # and a faint red wash on the missed cells so "failure" pops at a glance.
+    xmark = (f'<svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="{RED}" '
+             f'stroke-width="3.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>')
+    checkg = (f'<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="{GREYX}" '
               f'stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>')
-    left_marks = [checkg, checkg, xmark, xmark, checkg, xmark, xmark]
-    left_cells = "".join(f'<td>{m}</td>' for m in left_marks)
+    # (mark, is_miss)
+    left_marks = [(checkg, False), (checkg, False), (xmark, True), (xmark, True),
+                  (checkg, False), (xmark, True), (xmark, True)]
+    left_cells = "".join(
+        f'<td class="{"miss" if miss else ""}">{m}</td>' for m, miss in left_marks)
     left_head = "".join(f'<th>{d}</th>' for d in days)
 
     # RIGHT: our stamps
@@ -241,6 +246,7 @@ def build_tracker():
       table {{ width:100%; border-collapse:collapse; margin:22px 0 10px; text-align:center; }}
       th {{ font-size:24px; font-weight:600; color:{CW['ink_soft']}; padding:10px 0; }}
       td {{ height:96px; border:1px solid {CW['line']}; }}
+      td.miss {{ background:#F7DEDA; }}
       td img {{ width:56px; height:56px; vertical-align:middle; }}
       .banner {{ margin-top:20px; padding:16px 22px; border-radius:14px; font-size:24px;
         font-weight:600; text-align:center; }}
