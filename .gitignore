@@ -7,3 +7,9 @@ npm-debug.log*
 .DS_Store
 *.tsbuildinfo
 next-env.d.ts
+
+# ADHD planner build tooling
+.venv-planner/
+adhd-planner/build/preview/
+adhd-planner/build/contact-sheet.png
+adhd-planner/src/__pycache__/
