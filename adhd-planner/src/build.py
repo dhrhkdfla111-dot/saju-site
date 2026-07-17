@@ -34,6 +34,14 @@ ICONS = {
     "battery": _svg('<rect x="3" y="8" width="15" height="8" rx="2"/>'
                     '<path d="M21 11v2"/>'),
     "check":   _svg('<path d="M4 12l5 5L20 6"/>'),
+    "list":    _svg('<path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="4" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="4" cy="18" r="1.4" fill="currentColor" stroke="none"/>'),
+    "target":  _svg('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.4"/>'),
+    "help":    _svg('<circle cx="12" cy="12" r="9"/><path d="M9.2 9.2a2.8 2.8 0 015.4 1c0 1.9-2.6 2.3-2.6 4"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/>'),
+    "grid":    _svg('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/>'),
+    "gift":    _svg('<path d="M4 11h16v9H4z"/><path d="M2 7h20v4H2zM12 7v13"/><path d="M12 7S9.5 2 7.5 4 12 7 12 7zM12 7s2.5-5 4.5-3S12 7 12 7z"/>'),
+    "moon":    _svg('<path d="M20 14A8 8 0 019.5 3.5 8 8 0 1020 14z"/>'),
+    "calendar": _svg('<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9.5h18M8 3v4M16 3v4"/>'),
+    "star":    _svg('<path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z"/>'),
 }
 
 
@@ -64,8 +72,11 @@ def build_css(dark: bool) -> str:
         c.update({
             "bg": "#22262B", "bg_soft": "#2B3036", "ink": "#D9DEE3",
             "ink_soft": "#A6AEB6", "ink_faint": "#6C757E", "line": "#3A4046",
-            "blue_bg": "#2A3A46", "green_bg": "#28382C", "nav_bg": "#2B3036",
+            "blue_bg": "#2C3A44", "green_bg": "#2E3A31", "nav_bg": "#2B3036",
             "nav_ink": "#B7C0C8",
+            # softer, less-saturated accents so panels don't read as heavy blocks
+            "blue": "#6E9DBE", "green": "#7FAe8b", "blue_deep": "#9CC4E0",
+            "green_deep": "#96C7A2",
         })
     ty = C.TYPE
     F = C.FONTS
@@ -143,6 +154,20 @@ a.link {{ color:{c['blue_deep']}; text-decoration:none; font-weight:500; }}
 
 .page-label {{ position:absolute; bottom:26px; right:32px;
                font-size:13px; color:{c['ink_faint']}; }}
+.page-foot {{ position:absolute; bottom:24px; left:{C.MARGIN}px;
+              font-size:13px; color:{c['ink_faint']}; letter-spacing:1px; }}
+
+/* ---- standard page header ---- */
+.phead {{ display:flex; align-items:center; gap:18px; }}
+.phead h1 {{ line-height:1.15; }}
+.badge {{ width:62px; height:62px; border-radius:17px; flex:0 0 auto;
+          display:flex; align-items:center; justify-content:center; }}
+.badge .nav-icon {{ width:30px; height:30px; }}
+.badge-blue {{ background:{c['blue_bg']}; color:{c['blue_deep']}; }}
+.badge-green {{ background:{c['green_bg']}; color:{c['green_deep']}; }}
+.accent {{ height:5px; width:84px; border-radius:3px; margin:20px 0 30px; }}
+.accent-blue {{ background:{c['blue']}; }}
+.accent-green {{ background:{c['green']}; }}
 """
 
 
@@ -178,6 +203,17 @@ def writelines(n, width="100%", gap=54):
     return "".join(
         f'<div class="writeline" style="width:{width};margin-top:{gap}px"></div>'
         for _ in range(n))
+
+
+def page_header(title, icon_key, subtitle=None, tint="blue", size=None):
+    """Standard page title block: soft icon badge + title (+ subtitle) + accent bar.
+    Gives every content page a consistent, 'designed' identity tied to its section."""
+    icon = ICONS.get(icon_key, "")
+    sub = f'<p class="small" style="margin-top:2px">{subtitle}</p>' if subtitle else ""
+    style = f' style="font-size:{size}px"' if size else ""
+    return (f'<div class="phead"><div class="badge badge-{tint}">{icon}</div>'
+            f'<div><h1{style}>{title}</h1>{sub}</div></div>'
+            f'<div class="accent accent-{tint}"></div>')
 
 
 # ---------------------------------------------------------------------------
@@ -230,8 +266,7 @@ def page_checkin(_):
     return f"""
       <a class="back-note" href="#{ck['back_target']}">&#8627; {ck['back_note']}</a>
       <div class="body">
-        <h1>Today's Check-In</h1>
-        <div class="divider"></div>
+        {page_header("Today's Check-In", "sun", tint="blue")}
         <h3>Sleep</h3>
         <div class="row" style="margin:14px 0 26px">{sleep}</div>
         <h3>Energy</h3>
@@ -275,8 +310,8 @@ def page_braindump(_):
                     'vertical-align:top"></td>' for _ in bd["sort_headers"])
     return f"""
       <div class="body">
-        <h1>Brain Dump</h1>
-        <p class="faint" style="margin-top:8px">{cats}
+        {page_header("Brain Dump", "cloud", tint="blue")}
+        <p class="faint" style="margin-top:-14px">{cats}
           <span class="small">&nbsp;— faint hints, free writing still welcome</span></p>
         <div class="panel" style="height:520px;margin:22px 0">
           <span class="faint small">everything on your mind — just get it out</span>
@@ -302,9 +337,7 @@ def _bank(bank, tint):
     half2 = "".join(cols[2:])
     return f"""
       <div class="body">
-        <h1>{bank['title']}</h1>
-        <p class="small" style="margin-top:6px">{bank['subtitle']}</p>
-        <div class="divider"></div>
+        {page_header(bank['title'], "battery", subtitle=bank['subtitle'], tint=tint)}
         <div class="row" style="align-items:flex-start;gap:24px">
           <div style="flex:1">{half1}</div>
           <div style="flex:1">{half2}</div>
@@ -329,8 +362,7 @@ def page_breakdown(_):
         for i in range(b["steps"]))
     return f"""
       <div class="body">
-        <h1>Task Breakdown Sheet</h1>
-        <div class="divider"></div>
+        {page_header("Task Breakdown Sheet", "list", tint="green")}
         <h3>{b['big_label']}</h3>
         <div class="writeline" style="margin:18px 0 34px"></div>
         <div class="panel panel-green">
@@ -350,8 +382,7 @@ def page_focus(_):
         f'<span class="writeline" style="flex:1"></span></div>' for i in range(3))
     return f"""
       <div class="body">
-        <h1>Focus Plan</h1>
-        <div class="divider"></div>
+        {page_header("Focus Plan", "target", tint="blue")}
         <h3>{f['distract_prompt']}</h3>
         <div style="margin:20px 0 34px">{slots}</div>
         <h3>{f['remove_prompt']}</h3>
@@ -379,9 +410,7 @@ def page_putoff(_):
             f'<span><span{strong}>{it["text"]}</span> &nbsp;{resp}</span></div>')
     return f"""
       <div class="body">
-        <h1>{p['title']}</h1>
-        <p class="small" style="margin-top:6px">{p['subtitle']}</p>
-        <div class="divider"></div>
+        {page_header(p['title'], "help", subtitle=p['subtitle'], tint="blue")}
         {''.join(rows)}
       </div>"""
 
@@ -402,9 +431,7 @@ def page_habit(_):
         for label, color in h["legend"])
     return f"""
       <div class="body">
-        <h1>{h['title']}</h1>
-        <p class="small" style="margin-top:6px">{h['subtitle']}</p>
-        <div class="divider"></div>
+        {page_header(h['title'], "grid", subtitle=h['subtitle'], tint="green")}
         <table style="width:100%;border-collapse:collapse;text-align:center">
           <tr><th style="padding:14px">Habit</th>{day_head}</tr>{rows}
         </table>
@@ -431,8 +458,7 @@ def page_reward(_):
           </div>"""
     return f"""
       <div class="body">
-        <h1 style="font-size:36px">{r['title']}</h1>
-        <div class="divider"></div>
+        {page_header(r['title'], "star", tint="green", size=32)}
         {tiers}
         <div class="panel panel-blue" style="text-align:center;margin-top:8px">
           <h3>{r['footer']}</h3>
@@ -458,8 +484,7 @@ def page_monthly(_):
         cal += f"<tr>{cells}</tr>"
     return f"""
       <div class="body">
-        <h1>{m['title']}</h1>
-        <div class="divider"></div>
+        {page_header(m['title'], "calendar", tint="blue")}
         <h3>{m['goals_label']}</h3>
         <div style="margin:16px 0 8px">{goals}</div>
         <p class="small faint">({m['goals_note']})</p>
@@ -486,9 +511,12 @@ def render_html(dark: bool) -> str:
     pages = []
     for pg in T.PAGES:
         body = RENDERERS[pg["kind"]](pg)
-        nav = "" if pg["kind"] == "mindset" else render_nav(pg["nav"])
-        label = f'<div class="page-label">{pg["id"].replace("page-0","").replace("page-","")}</div>'
-        pages.append(f'<section class="page" id="{pg["id"]}">{nav}{body}{label}</section>')
+        is_cover = pg["kind"] == "mindset"
+        nav = "" if is_cover else render_nav(pg["nav"])
+        num = pg["id"].replace("page-0", "").replace("page-", "")
+        label = f'<div class="page-label">{num}</div>'
+        foot = "" if is_cover else f'<div class="page-foot">{C.PLANNER_TITLE.upper()}</div>'
+        pages.append(f'<section class="page" id="{pg["id"]}">{nav}{body}{foot}{label}</section>')
     css = build_css(dark)
     return (f'<!doctype html><html><head><meta charset="utf-8">'
             f'<style>{css}</style></head><body>{"".join(pages)}</body></html>')
