@@ -222,10 +222,12 @@ def build_tracker():
         f'<td class="{"miss" if miss else ""}">{m}</td>' for m, miss in left_marks)
     left_head = "".join(f'<th>{d}</th>' for d in days)
 
-    # RIGHT: our stamps
+    # RIGHT: our stamps — SAME week, SAME pattern, so each day contrasts directly:
+    #   a missed day (red X, left)  ->  lavender "it's okay" stamp (right)
+    #   a done day  (grey check)    ->  green "GOOD" stamp (right)
     good = f'<img src="file://{stick}/good-dot.png"/>'
     okay = f'<img src="file://{stick}/okay-dot.png"/>'
-    right_marks = [good, good, okay, good, good, okay, okay]
+    right_marks = [okay if miss else good for _, miss in left_marks]
     right_cells = "".join(f'<td>{m}</td>' for m in right_marks)
     right_head = "".join(f'<th>{d}</th>' for d in days)
 
