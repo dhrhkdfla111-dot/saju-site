@@ -169,6 +169,14 @@ a.link {{ color:{c['blue_deep']}; text-decoration:none; font-weight:500; }}
               background:{c['blue_bg']}; color:{c['blue_deep']};
               text-decoration:none; font-weight:500; font-size:{ty['small_px']}px; }}
 
+/* plain-text "tap for full ... Bank" links; margin-top:auto pins them to the
+   bottom of their box so the pair lines up regardless of checklist wrapping.
+   Colour is theme-aware (uses the active palette, not a hardcoded light value). */
+.bank-link {{ display:inline-block; margin-top:auto; padding-top:16px;
+              text-decoration:none; font-weight:500; font-size:{ty['small_px']}px; }}
+.bank-link-blue {{ color:{c['blue_deep']}; }}
+.bank-link-green {{ color:{c['green_deep']}; }}
+
 .back-note {{ position:absolute; top:104px; right:{C.MARGIN}px;
              max-width:360px; text-align:right; font-size:{ty['small_px']}px;
              color:{c['blue_deep']}; text-decoration:none; }}
@@ -292,25 +300,24 @@ def page_checkin(_):
         <div class="row" style="margin:14px 0">{mood}</div>
         <div class="divider"></div>
         <div class="row gap" style="align-items:stretch;gap:24px">
-          <div class="panel panel-blue" style="flex:1">
+          <div class="panel panel-blue" style="flex:1;display:flex;flex-direction:column">
             <div class="row" style="justify-content:space-between;align-items:baseline">
               <h3 style="white-space:nowrap"><span style="display:inline-flex;
                 align-items:center;gap:8px">{low_batt} Low Energy</span></h3>
               <span class="small">pick one</span>
             </div>
             {low}
-            <a class="pill-link" href="#{ck['low_target']}" style="margin-top:10px">
+            <a class="bank-link bank-link-blue" href="#{ck['low_target']}">
               tap for full Low Energy Bank &#8594;</a>
           </div>
-          <div class="panel panel-green" style="flex:1">
+          <div class="panel panel-green" style="flex:1;display:flex;flex-direction:column">
             <div class="row" style="justify-content:space-between;align-items:baseline">
               <h3 style="white-space:nowrap"><span style="display:inline-flex;
                 align-items:center;gap:8px">{high_batt} High Energy</span></h3>
               <span class="small">pick one</span>
             </div>
             {high}
-            <a class="pill-link" href="#{ck['high_target']}"
-               style="margin-top:10px;background:{C.COLORS['green_bg']};color:{C.COLORS['green_deep']}">
+            <a class="bank-link bank-link-green" href="#{ck['high_target']}">
               tap for full High Energy Bank &#8594;</a>
           </div>
         </div>
