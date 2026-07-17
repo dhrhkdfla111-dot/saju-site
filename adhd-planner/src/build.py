@@ -37,6 +37,24 @@ ICONS = {
 }
 
 
+def battery_svg(level: int, size: int = 44, fill_color: str | None = None) -> str:
+    """A horizontal battery icon whose inner bar fills by `level` (0-4).
+
+    Vector, not emoji — emoji batteries render inconsistently across PDF
+    viewers. level 0 = empty (lowest energy) ... 4 = full (highest energy).
+    """
+    fill_color = fill_color or C.COLORS["green_deep"]
+    inner_max = 12.5
+    w = inner_max * (level / 4)
+    fill = (f'<rect x="4.2" y="10" width="{w:.2f}" height="4" rx="1" '
+            f'fill="{fill_color}" stroke="none"/>' if w > 0.1 else "")
+    return (f'<svg viewBox="0 0 24 24" width="{size}" height="{size}" '
+            f'fill="none" stroke="{C.COLORS["ink"]}" stroke-width="1.6" '
+            f'stroke-linecap="round" stroke-linejoin="round">'
+            f'<rect x="2.5" y="8" width="16.5" height="8" rx="2.2"/>'
+            f'<path d="M21 10.6v2.8"/>{fill}</svg>')
+
+
 # ---------------------------------------------------------------------------
 # CSS
 # ---------------------------------------------------------------------------
@@ -175,10 +193,20 @@ def page_mindset(_):
         else:
             blocks.append(f'<p style="margin:14px 0;color:{C.COLORS["ink_soft"]}">{html}</p>')
     return f"""
-      <div class="body" style="display:flex;flex-direction:column;justify-content:center;
-           text-align:center;padding-left:120px;padding-right:120px">
-        <h1 style="margin-bottom:40px">{m['title']}</h1>
-        {''.join(blocks)}
+      <div class="body" style="display:flex;flex-direction:column;
+           text-align:center;padding-left:120px;padding-right:120px;padding-top:96px">
+        <div style="margin-bottom:56px">
+          <div style="font-size:56px;font-weight:700;color:{C.COLORS['blue_deep']};
+               letter-spacing:0.5px">{C.PLANNER_TITLE}</div>
+          <div class="small" style="margin-top:10px;letter-spacing:2px;
+               text-transform:uppercase">{C.PLANNER_TAGLINE}</div>
+          <div style="width:120px;height:3px;background:{C.COLORS['green']};
+               border-radius:2px;margin:26px auto 0"></div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+          <h1 style="margin-bottom:36px">{m['title']}</h1>
+          {''.join(blocks)}
+        </div>
       </div>"""
 
 
@@ -188,9 +216,15 @@ def page_checkin(_):
                     for s in ck["sleep"])
     mood = "".join(f'<span class="chip" style="margin-right:14px">{m}</span>'
                    for m in ck["mood"])
-    dots = "".join('<span style="width:22px;height:22px;border-radius:50%;'
-                   f'border:2px solid {C.COLORS["ink_faint"]};display:inline-block">'
-                   '</span>' for _ in range(5))
+    # Energy: 5 selectable battery icons, empty -> full, labels under the ends.
+    end_label = {0: "(low)", 4: "(high)"}
+    energy_cells = "".join(
+        f'<div style="display:flex;flex-direction:column;align-items:center;gap:8px">'
+        f'{battery_svg(i, size=48)}'
+        f'<span class="small">{end_label.get(i, "")}</span></div>'
+        for i in range(5))
+    low_batt = battery_svg(0, size=26)
+    high_batt = "".join(battery_svg(4, size=19) for _ in range(5))
     low = "".join(checkbox(x) for x in ck["low_examples"])
     high = "".join(checkbox(x) for x in ck["high_examples"])
     return f"""
@@ -201,19 +235,16 @@ def page_checkin(_):
         <h3>Sleep</h3>
         <div class="row" style="margin:14px 0 26px">{sleep}</div>
         <h3>Energy</h3>
-        <div class="row gap" style="margin:14px 0 8px">
-          {ICONS['battery']}<div class="row" style="gap:26px">{dots}</div>{ICONS['battery']}
-        </div>
-        <div class="row" style="justify-content:space-between;max-width:520px">
-          <span class="small">(low)</span><span class="small">(high)</span>
-        </div>
+        <div class="row" style="gap:40px;margin:16px 0 8px">{energy_cells}</div>
         <h3 style="margin-top:26px">Mood <span class="small">(circle one)</span></h3>
         <div class="row" style="margin:14px 0">{mood}</div>
         <div class="divider"></div>
         <div class="row gap" style="align-items:stretch;gap:24px">
           <div class="panel panel-blue" style="flex:1">
             <div class="row" style="justify-content:space-between;align-items:baseline">
-              <h3>&#128267; Low Energy</h3><span class="small">pick one</span>
+              <h3 style="white-space:nowrap"><span style="display:inline-flex;
+                align-items:center;gap:8px">{low_batt} Low Energy</span></h3>
+              <span class="small">pick one</span>
             </div>
             {low}
             <a class="pill-link" href="#{ck['low_target']}" style="margin-top:10px">
@@ -221,7 +252,9 @@ def page_checkin(_):
           </div>
           <div class="panel panel-green" style="flex:1">
             <div class="row" style="justify-content:space-between;align-items:baseline">
-              <h3>&#128267;&#128267;&#128267; High Energy</h3><span class="small">pick one</span>
+              <h3 style="white-space:nowrap"><span style="display:inline-flex;
+                align-items:center;gap:2px">{high_batt}<span style="margin-left:6px">High Energy</span></span></h3>
+              <span class="small">pick one</span>
             </div>
             {high}
             <a class="pill-link" href="#{ck['high_target']}"

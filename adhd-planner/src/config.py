@@ -95,3 +95,7 @@ NAV_STYLE = "tabs"
 # ---------------------------------------------------------------------------
 TITLE = "The Gentle Planner — ADHD Digital Planner"
 DARK_MODE = False   # primary build is light; dark is a separate optional file
+
+# Working title shown in the Page 1 title block — placeholder, to be finalized.
+PLANNER_TITLE = "ADHD Reset Planner"
+PLANNER_TAGLINE = "a gentle, guilt-free planner"
