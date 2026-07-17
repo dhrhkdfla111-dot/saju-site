@@ -45,22 +45,42 @@ ICONS = {
 }
 
 
-def battery_svg(level: int, size: int = 44, fill_color: str | None = None) -> str:
-    """A horizontal battery icon whose inner bar fills by `level` (0-4).
+def battery_svg(fill: float, size: int = 44, fill_color: str | None = None) -> str:
+    """Reusable battery icon. `fill` is 0.0-1.0 (empty -> full).
 
-    Vector, not emoji — emoji batteries render inconsistently across PDF
-    viewers. level 0 = empty (lowest energy) ... 4 = full (highest energy).
+    The outline/frame and overall size are IDENTICAL for every fill level —
+    only the inner bar width changes — so any row of these stays perfectly
+    consistent automatically. Vector, not emoji (emoji batteries render
+    inconsistently across PDF viewers).
     """
     fill_color = fill_color or C.COLORS["green_deep"]
+    fill = max(0.0, min(1.0, fill))
     inner_max = 12.5
-    w = inner_max * (level / 4)
-    fill = (f'<rect x="4.2" y="10" width="{w:.2f}" height="4" rx="1" '
-            f'fill="{fill_color}" stroke="none"/>' if w > 0.1 else "")
-    return (f'<svg viewBox="0 0 24 24" width="{size}" height="{size}" '
+    w = inner_max * fill
+    bar = (f'<rect x="4.2" y="10" width="{w:.2f}" height="4" rx="1" '
+           f'fill="{fill_color}" stroke="none"/>' if w > 0.1 else "")
+    return (f'<svg viewBox="0 0 24 24" width="{size}" height="{size}" style="display:block" '
             f'fill="none" stroke="{C.COLORS["ink"]}" stroke-width="1.6" '
             f'stroke-linecap="round" stroke-linejoin="round">'
             f'<rect x="2.5" y="8" width="16.5" height="8" rx="2.2"/>'
-            f'<path d="M21 10.6v2.8"/>{fill}</svg>')
+            f'<path d="M21 10.6v2.8"/>{bar}</svg>')
+
+
+def energy_selector(steps: int = 5, size: int = 52) -> str:
+    """The 5-step energy picker: equal-width columns so the batteries sit on one
+    baseline with even spacing; only each battery's fill differs. (low)/(high)
+    labels align under the first/last column."""
+    cells = "".join(
+        f'<div style="flex:1;display:flex;justify-content:center">'
+        f'{battery_svg(i / (steps - 1), size=size)}</div>'
+        for i in range(steps))
+    mids = '<span style="flex:1"></span>' * (steps - 2)
+    labels = (f'<span style="flex:1;text-align:center">(low)</span>{mids}'
+              f'<span style="flex:1;text-align:center">(high)</span>')
+    return (f'<div style="max-width:600px">'
+            f'<div style="display:flex;align-items:center">{cells}</div>'
+            f'<div class="small" style="display:flex;margin-top:10px">{labels}</div>'
+            f'</div>')
 
 
 # ---------------------------------------------------------------------------
@@ -140,8 +160,9 @@ a.link {{ color:{c['blue_deep']}; text-decoration:none; font-weight:500; }}
 .writeline {{ border-bottom:1.5px solid {c['line']}; height:0; }}
 
 .chip {{ display:inline-flex; align-items:center; justify-content:center;
-         padding:8px 18px; border-radius:999px; border:1.5px solid {c['line']};
-         color:{c['ink_soft']}; font-size:{ty['small_px']}px; background:{c['bg']}; }}
+         height:46px; padding:0 24px; line-height:1; border-radius:999px;
+         border:1.5px solid {c['line']}; color:{c['ink_soft']};
+         font-size:{ty['small_px']}px; background:{c['bg']}; text-align:center; }}
 
 .pill-link {{ display:inline-flex; align-items:center; gap:8px;
               padding:10px 20px; border-radius:999px;
@@ -252,15 +273,11 @@ def page_checkin(_):
                     for s in ck["sleep"])
     mood = "".join(f'<span class="chip" style="margin-right:14px">{m}</span>'
                    for m in ck["mood"])
-    # Energy: 5 selectable battery icons, empty -> full, labels under the ends.
-    end_label = {0: "(low)", 4: "(high)"}
-    energy_cells = "".join(
-        f'<div style="display:flex;flex-direction:column;align-items:center;gap:8px">'
-        f'{battery_svg(i, size=48)}'
-        f'<span class="small">{end_label.get(i, "")}</span></div>'
-        for i in range(5))
-    low_batt = battery_svg(0, size=26)
-    high_batt = "".join(battery_svg(4, size=19) for _ in range(5))
+    # Energy: reusable 5-step selector (one baseline, even spacing, identical frames)
+    energy = energy_selector(5, size=52)
+    # Box headers: the SAME battery component as a matched pair — 1 empty / 1 full.
+    low_batt = battery_svg(0.0, size=28)
+    high_batt = battery_svg(1.0, size=28)
     low = "".join(checkbox(x) for x in ck["low_examples"])
     high = "".join(checkbox(x) for x in ck["high_examples"])
     return f"""
@@ -270,7 +287,7 @@ def page_checkin(_):
         <h3>Sleep</h3>
         <div class="row" style="margin:14px 0 26px">{sleep}</div>
         <h3>Energy</h3>
-        <div class="row" style="gap:40px;margin:16px 0 8px">{energy_cells}</div>
+        <div style="margin:16px 0 8px">{energy}</div>
         <h3 style="margin-top:26px">Mood <span class="small">(circle one)</span></h3>
         <div class="row" style="margin:14px 0">{mood}</div>
         <div class="divider"></div>
@@ -288,7 +305,7 @@ def page_checkin(_):
           <div class="panel panel-green" style="flex:1">
             <div class="row" style="justify-content:space-between;align-items:baseline">
               <h3 style="white-space:nowrap"><span style="display:inline-flex;
-                align-items:center;gap:2px">{high_batt}<span style="margin-left:6px">High Energy</span></span></h3>
+                align-items:center;gap:8px">{high_batt} High Energy</span></h3>
               <span class="small">pick one</span>
             </div>
             {high}
