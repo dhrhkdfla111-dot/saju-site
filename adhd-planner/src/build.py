@@ -341,7 +341,7 @@ def page_checkin(_):
       <a class="back-note" href="#{ck['back_target']}">&#8627; {ck['back_note']}</a>
       <div class="body">
         {page_header("Today's Check-In", "sun", tint="blue")}
-        {meta_field(f'Date: Month {blank(70)} Day {blank(46)} Year {blank(64)} &nbsp;&middot;&nbsp; Day of week: {blank(76)}')}
+        {meta_field(f'Date: Month {blank(70)} Day {blank(46)} Year {blank(64)}')}
         <h3>Sleep</h3>
         <div class="row" style="margin:14px 0 26px">{sleep}</div>
         <h3>Energy</h3>
