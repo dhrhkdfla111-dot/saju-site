@@ -9,7 +9,9 @@
 
 ## Listing title (for the title field)
 
-ADHD Digital Planner | Hyperlinked GoodNotes Notability iPad | Energy-Based Guilt-Free Daily Planner | Light + Dark | Instant Download
+ADHD Reset Planner, Undated Hyperlinked Digital Planner, GoodNotes Notability iPad, Energy-Based Guilt-Free, Light + Dark, Instant Download
+
+*(139 characters — under Etsy's 140-char title limit.)*
 
 ---
 
@@ -40,6 +42,13 @@ This one is built the other way around.
 
 • Near-zero setup — One file, import, done. No account, no add-ons, no template
   stitching.
+
+🔁 UNDATED & REUSABLE
+
+This is a template set — one clean copy of each page (Check-In, Brain Dump, Habit
+Tracker, and more), with no dates pre-printed. Start any day, any month. When you
+want a fresh page, duplicate it in your app in one tap (fully explained in the
+included guide) — so it works for you indefinitely, not just for one calendar year.
 
 📦 WHAT'S INCLUDED (instant digital download)
 
@@ -81,7 +90,7 @@ more thing to be perfect at. Be gentle with yourself. Rest counts too. 🌿
 
 adhd planner, digital planner, goodnotes planner, notability planner, hyperlinked
 planner, ipad planner, energy planner, guilt free planner, habit tracker,
-neurodivergent, executive function, dark mode planner, instant download
+neurodivergent, executive function, undated planner, instant download
 
 ## Materials / files (Etsy "materials" field)
 
