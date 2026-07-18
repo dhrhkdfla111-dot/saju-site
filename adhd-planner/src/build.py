@@ -17,6 +17,36 @@ from weasyprint import HTML
 import config as C
 import content as T
 
+
+# ---------------------------------------------------------------------------
+# Active palette
+# ---------------------------------------------------------------------------
+# The single source of truth for colours in BOTH the CSS and every inline style /
+# SVG helper. render_html() swaps this to the dark palette before rendering the
+# dark file, so inline colours (table borders, battery outlines, etc.) follow the
+# theme automatically instead of being baked to the light values.
+DARK_OVERRIDES = {
+    "bg": "#22262B", "bg_soft": "#2B3036", "ink": "#D9DEE3",
+    "ink_soft": "#A6AEB6", "ink_faint": "#6C757E", "line": "#3A4046",
+    "blue_bg": "#2C3A44", "green_bg": "#2E3A31", "nav_bg": "#2B3036",
+    "nav_ink": "#B7C0C8",
+    # softer, less-saturated accents so panels don't read as heavy blocks
+    "blue": "#6E9DBE", "green": "#7FAE8B", "blue_deep": "#9CC4E0",
+    "green_deep": "#96C7A2",
+}
+
+
+def palette(dark: bool) -> dict:
+    c = dict(C.COLORS)
+    if dark:
+        c.update(DARK_OVERRIDES)
+    return c
+
+
+# module-level active palette (light by default; render_html swaps it per theme)
+PAL = palette(False)
+
+
 # ---------------------------------------------------------------------------
 # Small inline-SVG icon set for the nav bar (stroke = currentColor)
 # ---------------------------------------------------------------------------
@@ -53,14 +83,14 @@ def battery_svg(fill: float, size: int = 44, fill_color: str | None = None) -> s
     consistent automatically. Vector, not emoji (emoji batteries render
     inconsistently across PDF viewers).
     """
-    fill_color = fill_color or C.COLORS["green_deep"]
+    fill_color = fill_color or PAL["green_deep"]
     fill = max(0.0, min(1.0, fill))
     inner_max = 12.5
     w = inner_max * fill
     bar = (f'<rect x="4.2" y="10" width="{w:.2f}" height="4" rx="1" '
            f'fill="{fill_color}" stroke="none"/>' if w > 0.1 else "")
     return (f'<svg viewBox="0 0 24 24" width="{size}" height="{size}" style="display:block" '
-            f'fill="none" stroke="{C.COLORS["ink"]}" stroke-width="1.6" '
+            f'fill="none" stroke="{PAL["ink"]}" stroke-width="1.6" '
             f'stroke-linecap="round" stroke-linejoin="round">'
             f'<rect x="2.5" y="8" width="16.5" height="8" rx="2.2"/>'
             f'<path d="M21 10.6v2.8"/>{bar}</svg>')
@@ -87,17 +117,7 @@ def energy_selector(steps: int = 5, size: int = 52) -> str:
 # CSS
 # ---------------------------------------------------------------------------
 def build_css(dark: bool) -> str:
-    c = dict(C.COLORS)
-    if dark:
-        c.update({
-            "bg": "#22262B", "bg_soft": "#2B3036", "ink": "#D9DEE3",
-            "ink_soft": "#A6AEB6", "ink_faint": "#6C757E", "line": "#3A4046",
-            "blue_bg": "#2C3A44", "green_bg": "#2E3A31", "nav_bg": "#2B3036",
-            "nav_ink": "#B7C0C8",
-            # softer, less-saturated accents so panels don't read as heavy blocks
-            "blue": "#6E9DBE", "green": "#7FAe8b", "blue_deep": "#9CC4E0",
-            "green_deep": "#96C7A2",
-        })
+    c = palette(dark)
     ty = C.TYPE
     F = C.FONTS
     return f"""
@@ -256,16 +276,16 @@ def page_mindset(_):
         if kind == "strong":
             blocks.append(f'<p class="strong" style="font-size:26px;margin:22px 0">{html}</p>')
         else:
-            blocks.append(f'<p style="margin:14px 0;color:{C.COLORS["ink_soft"]}">{html}</p>')
+            blocks.append(f'<p style="margin:14px 0;color:{PAL["ink_soft"]}">{html}</p>')
     return f"""
       <div class="body" style="display:flex;flex-direction:column;
            text-align:center;padding-left:120px;padding-right:120px;padding-top:96px">
         <div style="margin-bottom:56px">
-          <div style="font-size:56px;font-weight:700;color:{C.COLORS['blue_deep']};
+          <div style="font-size:56px;font-weight:700;color:{PAL['blue_deep']};
                letter-spacing:0.5px">{C.PLANNER_TITLE}</div>
           <div class="small" style="margin-top:10px;letter-spacing:2px;
                text-transform:uppercase">{C.PLANNER_TAGLINE}</div>
-          <div style="width:120px;height:3px;background:{C.COLORS['green']};
+          <div style="width:120px;height:3px;background:{PAL['green']};
                border-radius:2px;margin:26px auto 0"></div>
         </div>
         <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
@@ -328,9 +348,9 @@ def page_braindump(_):
     bd = T.BRAINDUMP
     cats = " &middot; ".join(bd["categories"])
     heads = "".join(f'<th style="padding:16px;text-align:left;font-weight:600;'
-                    f'border:1px solid {C.COLORS["line"]}">{h}</th>'
+                    f'border:1px solid {PAL["line"]}">{h}</th>'
                     for h in bd["sort_headers"])
-    cells = "".join(f'<td style="height:220px;border:1px solid {C.COLORS["line"]};'
+    cells = "".join(f'<td style="height:220px;border:1px solid {PAL["line"]};'
                     'vertical-align:top"></td>' for _ in bd["sort_headers"])
     return f"""
       <div class="body">
@@ -391,7 +411,7 @@ def page_breakdown(_):
         <div class="writeline" style="margin:18px 0 34px"></div>
         <div class="panel panel-green">
           <h3>&#8594; {b['first_label']}</h3>
-          <div class="writeline" style="margin-top:22px;border-color:{C.COLORS['green_deep']}"></div>
+          <div class="writeline" style="margin-top:22px;border-color:{PAL['green_deep']}"></div>
           <p class="small" style="margin-top:14px">({b['first_hint']})</p>
         </div>
         <div style="margin-top:30px">{steps}</div>
@@ -444,14 +464,14 @@ def page_habit(_):
     day_head = "".join(f'<th style="padding:14px;font-weight:600">{d}</th>' for d in h["days"])
     rows = ""
     for _ in range(h["habit_rows"]):
-        cells = "".join(f'<td style="border:1px solid {C.COLORS["line"]};height:96px"></td>'
+        cells = "".join(f'<td style="border:1px solid {PAL["line"]};height:96px"></td>'
                         for _ in h["days"])
-        rows += (f'<tr><td style="border:1px solid {C.COLORS["line"]};width:220px;'
+        rows += (f'<tr><td style="border:1px solid {PAL["line"]};width:220px;'
                  'height:96px"></td>' + cells + '</tr>')
     legend = "".join(
         f'<div class="row gap" style="margin-right:36px">'
         f'<span style="width:30px;height:30px;border-radius:50%;'
-        f'background:{C.COLORS[color]}"></span><span>{label}</span></div>'
+        f'background:{PAL[color]}"></span><span>{label}</span></div>'
         for label, color in h["legend"])
     return f"""
       <div class="body">
@@ -501,7 +521,7 @@ def page_monthly(_):
     for _ in range(5):
         cells = ""
         for _ in range(7):
-            cells += (f'<td style="border:1px solid {C.COLORS["line"]};height:104px;'
+            cells += (f'<td style="border:1px solid {PAL["line"]};height:104px;'
                       'vertical-align:top;padding:8px" class="small faint">'
                       f'{day if day <= 31 else ""}</td>')
             day += 1
@@ -532,6 +552,8 @@ RENDERERS = {
 # Assemble
 # ---------------------------------------------------------------------------
 def render_html(dark: bool) -> str:
+    global PAL
+    PAL = palette(dark)   # inline styles & SVG helpers read this; must match theme
     pages = []
     for pg in T.PAGES:
         body = RENDERERS[pg["kind"]](pg)
