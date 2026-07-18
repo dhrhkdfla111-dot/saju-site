@@ -83,9 +83,11 @@ You have two ways to use them — pick whichever your app supports best.
 
 **Option A — drag from Files (works in GoodNotes):**
 1. In GoodNotes, open the **image/sticker** tool (the sticker or photo icon).
-2. Add `good-stamp.png` and `okay-stamp.png` (and the dots) to a sticker
-   collection, or drag them straight from the **Files** app onto the page.
-3. Drop a stamp on any Habit Tracker cell. Resize with the corner handles.
+2. For a **tracker cell, use `good-dot.png` / `okay-dot.png`** — they're already
+   sized to fit, no resizing needed. Add them to a sticker collection, or drag
+   them straight from the **Files** app onto the cell.
+3. `good-stamp.png` / `okay-stamp.png` are the **larger** versions — handy for a
+   bigger stamp elsewhere on the page. Resize any sticker with the corner handles.
 
 **Option B — lasso-copy from the sticker sheet (works everywhere):**
 1. Import `stickers/sticker-sheet.pdf` (or keep it as a page).

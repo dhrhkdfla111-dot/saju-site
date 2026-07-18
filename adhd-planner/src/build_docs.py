@@ -64,8 +64,9 @@ PAGE1 = f"""
     <li>Tap the <strong>top navigation bar</strong> — it should jump between pages.
       That means everything works.</li>
   </ol>
-  <div class="panel panel-blue small">Pick <strong>one</strong> planner file —
-    <strong>Light</strong> (recommended) or <strong>Dark</strong>. You don't need both.</div>
+  <div class="panel panel-blue small"><strong style="color:{CW['blue_deep']}">TIP &middot;</strong>
+    Pick <strong>one</strong> planner file — <strong>Light</strong> (recommended) or
+    <strong>Dark</strong>. You don't need both. <em>(This is a tip, not a step.)</em></div>
 
   <h2><span class="dot"></span>How to navigate</h2>
   <ul>
@@ -73,14 +74,18 @@ PAGE1 = f"""
       To-Do · Tasks. Tap to jump from anywhere.</li>
     <li><strong>Energy → tasks:</strong> on Check-In, tap "full Low / High Energy
       Bank" to get tasks that match today's energy.</li>
+    <li><strong>Energy Bank → Check-In:</strong> from either Energy Bank page, tap
+      "↳ Back to Check-In" to return and note down what you picked.</li>
     <li><strong>Gentle loop:</strong> the note on Check-In links back to the
       Mindset page for the hard days.</li>
   </ul>
 
   <h2><span class="dot"></span>Habit stamps</h2>
-  <p class="small">Drag <strong>good-stamp.png</strong> / <strong>okay-stamp.png</strong>
-  from Files onto a tracker cell, or lasso-copy from <strong>sticker-sheet.pdf</strong>.
-  GOOD (green) = did it. it's okay (lavender) = didn't, and that's fine.</p>
+  <p class="small">Drag <strong>good-dot.png / okay-dot.png</strong> onto a tracker
+  cell — they're already sized to fit. (<strong>good-stamp.png / okay-stamp.png</strong>
+  are the larger versions, handy for a bigger stamp elsewhere.) You can also lasso-copy
+  from <strong>sticker-sheet.pdf</strong>. GOOD (green) = did it; it's okay (lavender)
+  = didn't, and that's fine.</p>
 
   <div class="foot"><span>ADHD RESET PLANNER</span><span>1 / 2</span></div>
 </div>
@@ -115,6 +120,7 @@ PAGE2 = f"""
       <li><strong>Update your app</strong> (Notability needs v11+ for internal links).</li>
       <li><strong>Turn off the pen/eraser first</strong> — switch to the Hand/Pointer
         tool, then tap the link.</li>
+      <li><strong>Tap right on the tab/label</strong> — zoom in a little and tap it directly.</li>
       <li><strong>Don't "flatten" or "print to PDF"</strong> — it can strip the links.</li>
     </ol>
   </div>
