@@ -25,7 +25,7 @@ h1 {{ font-size:44px; font-weight:700; color:{CW['blue_deep']}; }}
 .tag {{ font-size:16px; letter-spacing:2px; text-transform:uppercase;
   color:{CW['ink_soft']}; margin-top:8px; }}
 .accent {{ height:5px; width:84px; border-radius:3px; background:{CW['green']}; margin:20px 0 30px; }}
-h2 {{ font-size:24px; font-weight:600; margin:26px 0 12px;
+h2 {{ font-size:24px; font-weight:600; margin:18px 0 10px;
   display:flex; align-items:center; gap:12px; }}
 h2 .dot {{ width:14px; height:14px; border-radius:50%; background:{CW['blue']}; flex:0 0 auto; }}
 p {{ margin:0 0 10px; }}
@@ -100,14 +100,21 @@ PAGE2 = f"""
     <li><strong>Xodo:</strong> page thumbnail panel → long-press → Duplicate.</li>
   </ul>
 
-  <h2><span class="dot"></span>Links won't jump? Try this</h2>
+  <h2><span class="dot"></span>GoodNotes: one-tap vs long-press</h2>
+  <div class="panel panel-blue small">
+    Need to long-press and tap <strong>"Open Link"</strong>? That's normal GoodNotes.
+    <strong>Edit mode</strong> (default) needs the long-press; <strong>Read-Only
+    mode</strong> jumps on a single tap — tap the <strong>pencil icon (top-right)</strong>
+    to switch.
+  </div>
+
+  <h2><span class="dot"></span>Links still won't jump? Try this</h2>
   <div class="panel panel-green small">
     <ol style="margin-left:22px">
       <li><strong>Import as a document, not an image</strong> ("as image" flattens links).</li>
       <li><strong>Update your app</strong> (Notability needs v11+ for internal links).</li>
       <li><strong>Turn off the pen/eraser first</strong> — switch to the Hand/Pointer
         tool, then tap the link.</li>
-      <li><strong>Tap right on the tab/label</strong> — zoom in a little and tap it directly.</li>
       <li><strong>Don't "flatten" or "print to PDF"</strong> — it can strip the links.</li>
     </ol>
   </div>

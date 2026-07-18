@@ -115,6 +115,18 @@ so they're ready when you are. (No pressure to fill them all — that's the poin
 
 ## ❓ FAQ & troubleshooting
 
+**Q: In GoodNotes, I have to long-press and tap "Open Link" instead of just
+tapping — is that normal?**
+Yes — that's expected GoodNotes behavior, not a broken link. GoodNotes has two
+modes:
+- **Edit mode** (default): links need a long-press, then tap **"Open Link"** —
+  this prevents accidental jumps while you're writing.
+- **Read-Only mode**: a single light tap jumps instantly, no popup.
+
+To switch: tap the **pencil icon in the top-right corner** of GoodNotes to enter
+Read-Only mode. Use this mode whenever you just want to navigate without writing
+on the page.
+
 **Q: The links / nav bar won't jump when I tap. What do I do?**
 Work down this list — one of these fixes it almost every time:
 1. **Import as a document, not an image.** "Import as image" flattens the links.

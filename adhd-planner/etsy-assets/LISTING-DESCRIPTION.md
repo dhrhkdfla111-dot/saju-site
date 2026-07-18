@@ -65,6 +65,10 @@ This one is built the other way around.
   digital, all sales are final, but if anything doesn't work, message me and
   I'll help you get it running.
 
+💡 Tip: In GoodNotes, switch to Read-Only mode (top-right pencil icon) for instant
+one-tap navigation. In edit mode, links need a long-press + "Open Link" — this is
+a GoodNotes app behavior, not a planner issue.
+
 💛 A NOTE FROM ME
 
 You don't have to use every page, every day. Open it on the days you can, skip

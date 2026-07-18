@@ -32,9 +32,12 @@ FONT_FACE = f"""
 CHECK = ('<svg viewBox="0 0 24 24" width="{s}" height="{s}" fill="none" '
          'stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" '
          'stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>')
-HEART = ('<svg viewBox="0 0 24 24" width="{s}" height="{s}" fill="{c}" '
-         'stroke="none"><path d="M12 21s-7-4.6-9.3-9C1 8.5 2.6 5 6 5c2 0 3.2 1.2 '
-         '4 2.3C10.8 6.2 12 5 14 5c3.4 0 5 3.5 3.3 7C19 16.4 12 21 12 21z"/></svg>')
+# Standard symmetric "favorite" heart (Material Design path) — equal lobes,
+# bottom point centred on x=12. Avoids the lopsided custom path used before.
+HEART = ('<svg viewBox="0 0 24 24" width="{s}" height="{s}" fill="{c}" stroke="none">'
+         '<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3'
+         'c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5'
+         'c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>')
 
 
 def stamp_html(size, fill, label, glyph, label_color, fs):
