@@ -179,6 +179,8 @@ a.link {{ color:{c['blue_deep']}; text-decoration:none; font-weight:500; }}
 
 .checkbox {{ width:26px; height:26px; border:2px solid {c['ink_faint']};
              border-radius:7px; display:inline-block; flex:0 0 auto; }}
+.bullet {{ width:8px; height:8px; border-radius:50%; background:{c['ink_faint']};
+           display:inline-block; flex:0 0 auto; margin:0 9px; }}
 .writeline {{ border-bottom:1.5px solid {c['line']}; height:0; }}
 
 .chip {{ display:inline-flex; align-items:center; justify-content:center;
@@ -268,14 +270,18 @@ def meta_field(inner):
     return f'<div class="meta">{inner}</div>'
 
 
-def escape_hatch(compact=False):
+def escape_hatch(compact=False, checkbox=True):
     """A gentle 'none of these fit' opt-out for the To-Do banks — a blank
     write-in line + a quiet reassurance, matching the guilt-free tone used on the
     Reward Chart / procrastination pages. `compact` = the tight Page-2 mini boxes
-    (smaller type, 2 short lines); otherwise = the roomier full bank pages."""
+    (smaller type, 2 short lines); otherwise = the roomier full bank pages.
+    `checkbox=False` swaps the leading box for a bullet (used on the reference
+    bank pages, which carry no checkboxes)."""
     fs = "font-size:15px;" if compact else ""
     top = "10px" if compact else "20px"
-    write = (f'<div class="row gap" style="margin-top:{top}"><span class="checkbox"></span>'
+    marker = ('<span class="checkbox"></span>' if checkbox
+              else f'<span class="bullet"></span>')
+    write = (f'<div class="row gap" style="margin-top:{top}">{marker}'
              f'<span style="{fs}white-space:nowrap">Or write your own:</span>'
              f'<span class="writeline" style="flex:1;margin-left:10px"></span></div>')
     opt = (f'<div class="faint" style="{fs or "font-size:16px;"}margin-top:8px">'
@@ -402,10 +408,13 @@ def page_braindump(_):
 
 
 def _bank(bank, tint):
+    # Reference-menu pages: plain bullets, no checkboxes (these pages are never
+    # duplicated/dated, so a checked box here couldn't mean "did it today" — the
+    # dated record lives on the Check-In page instead).
     cols = []
     for group, items in bank["groups"].items():
         lis = "".join(f'<div class="row gap" style="margin:10px 0">'
-                      f'<span class="checkbox"></span><span>{i}</span></div>'
+                      f'<span class="bullet"></span><span>{i}</span></div>'
                       for i in items)
         cols.append(f'<div class="panel panel-{tint}" style="margin-bottom:22px">'
                     f'<h3 style="margin-bottom:8px">{group}</h3>{lis}</div>')
@@ -415,11 +424,13 @@ def _bank(bank, tint):
       <a class="back-note" href="#page-02">&#8627; Back to Check-In</a>
       <div class="body">
         {page_header(bank['title'], "battery", subtitle=bank['subtitle'], tint=tint)}
+        <p class="small" style="margin:-14px 0 24px">Pick one, then head back to your
+          Check-In page to note it down.</p>
         <div class="row" style="align-items:flex-start;gap:24px">
           <div style="flex:1">{half1}</div>
           <div style="flex:1">{half2}</div>
         </div>
-        <div style="max-width:760px;margin-top:4px">{escape_hatch(compact=False)}</div>
+        <div style="max-width:760px;margin-top:4px">{escape_hatch(compact=False, checkbox=False)}</div>
       </div>"""
 
 
