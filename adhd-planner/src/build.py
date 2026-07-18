@@ -254,6 +254,21 @@ def writelines(n, width="100%", gap=54):
         for _ in range(n))
 
 
+def escape_hatch(compact=False):
+    """A gentle 'none of these fit' opt-out for the To-Do banks — a blank
+    write-in line + a quiet reassurance, matching the guilt-free tone used on the
+    Reward Chart / procrastination pages. `compact` = the tight Page-2 mini boxes
+    (smaller type, 2 short lines); otherwise = the roomier full bank pages."""
+    fs = "font-size:15px;" if compact else ""
+    top = "10px" if compact else "20px"
+    write = (f'<div class="row gap" style="margin-top:{top}"><span class="checkbox"></span>'
+             f'<span style="{fs}white-space:nowrap">Or write your own:</span>'
+             f'<span class="writeline" style="flex:1;margin-left:10px"></span></div>')
+    opt = (f'<div class="faint" style="{fs or "font-size:16px;"}margin-top:8px">'
+           f'None of these feel right? <span class="strong">That&rsquo;s okay too.</span></div>')
+    return write + opt
+
+
 def page_header(title, icon_key, subtitle=None, tint="blue", size=None):
     """Standard page title block: soft icon badge + title (+ subtitle) + accent bar.
     Gives every content page a consistent, 'designed' identity tied to its section."""
@@ -327,6 +342,7 @@ def page_checkin(_):
               <span class="small">pick one</span>
             </div>
             {low}
+            {escape_hatch(compact=True)}
             <a class="bank-link bank-link-blue" href="#{ck['low_target']}">
               tap for full Low Energy Bank &#8594;</a>
           </div>
@@ -337,6 +353,7 @@ def page_checkin(_):
               <span class="small">pick one</span>
             </div>
             {high}
+            {escape_hatch(compact=True)}
             <a class="bank-link bank-link-green" href="#{ck['high_target']}">
               tap for full High Energy Bank &#8594;</a>
           </div>
@@ -386,6 +403,7 @@ def _bank(bank, tint):
           <div style="flex:1">{half1}</div>
           <div style="flex:1">{half2}</div>
         </div>
+        <div style="max-width:760px;margin-top:4px">{escape_hatch(compact=False)}</div>
       </div>"""
 
 
