@@ -11,13 +11,15 @@ each link. Pulled directly from the final build's link structure — not the spe
 4. Repeat the whole sheet for the **Dark** file, then (ideally) redo in Notability.
 
 ## Link count (what "complete" looks like)
-- **58 distinct tappable links** in the document = **50 nav** (5 tabs × 10 pages)
-  + **8 content links**.
-- The earlier automated check reported **78/78** — that counts each link's
+- **60 distinct tappable links** in the document = **50 nav** (5 tabs × 10 pages)
+  + **10 content links**.
+- The automated check now reports **80/80** — that counts each link's
   sub-rectangles/label fragments separately (the nav tabs are icon+label, so
-  they split into multiple rects). Raw annotation rectangles = **209**. All three
+  they split into multiple rects). Raw annotation rectangles = **211**. All three
   numbers describe the same links; all verified **0 broken** in the build.
-- This checklist tests **all 8 content links** + a **nav sample from 2 pages**
+- *(Round 5 added 2 new content links: "↳ Back to Check-In" on Pages 4 & 5,
+  bringing content links from 8 → 10 and the automated count from 78 → 80.)*
+- This checklist tests **all 10 content links** + a **nav sample from 2 pages**
   (nav is identical on every page). An **optional full nav sweep** is at the end
   if you want to tap all 50.
 
@@ -31,10 +33,10 @@ each link. Pulled directly from the final build's link structure — not the spe
 | **Tasks** | Page 6 — Task Breakdown *(enters the task tools here)* |
 
 ## Scoreboard (fill in when done)
-- **Light PDF (GoodNotes):** Pass ____ / 18   · broken links: ____
-- **Dark PDF (GoodNotes):** Pass ____ / 18   · broken links: ____
-- **Light PDF (Notability):** Pass ____ / 18   · broken links: ____
-- **Dark PDF (Notability):** Pass ____ / 18   · broken links: ____
+- **Light PDF (GoodNotes):** Pass ____ / 20   · broken links: ____
+- **Dark PDF (GoodNotes):** Pass ____ / 20   · broken links: ____
+- **Light PDF (Notability):** Pass ____ / 20   · broken links: ____
+- **Dark PDF (Notability):** Pass ____ / 20   · broken links: ____
 - (Optional full nav sweep: ____ / 50 per file)
 
 ---
@@ -79,6 +81,14 @@ each link. Pulled directly from the final build's link structure — not the spe
 - [ ] Bottom link: **"Something to act on? Take it to Task Breakdown. →"** → **Page 6 (Task Breakdown)**
   - Notes: ________________________________________________
 
+### Page 4 — Low Energy Bank  *(1 link)*
+- [ ] Top-right: **"↳ Back to Check-In"** → **Page 2 (Check-In)**
+  - Notes: ________________________________________________
+
+### Page 5 — High Energy Bank  *(1 link)*
+- [ ] Top-right: **"↳ Back to Check-In"** → **Page 2 (Check-In)**
+  - Notes: ________________________________________________
+
 ### Page 8 — Why Am I Putting This Off?  *(4 links)*
 - [ ] **"It feels too big → go to the Task Breakdown Sheet"** → **Page 6 (Task Breakdown)**
   - Notes: ________________________________________________
@@ -89,10 +99,10 @@ each link. Pulled directly from the final build's link structure — not the spe
 - [ ] **"I have no energy → pick one tiny thing from the Low Energy Bank"** → **Page 4 (Low Energy Bank)**
   - Notes: ________________________________________________
 
-> Pages 4, 5, 6, 7, 9, 10, 11 have **no content links** — only the top nav bar
+> Pages 6, 7, 9, 10, 11 have **no content links** — only the top nav bar
 > (already covered in sections A/B). Nothing to tap in the body there.
 
-**Light PDF subtotal:** 10 nav + 8 content = **18 checks**
+**Light PDF subtotal:** 10 nav + 10 content = **20 checks**
 
 ---
 
@@ -138,6 +148,14 @@ each link. Pulled directly from the final build's link structure — not the spe
 - [ ] **"Something to act on? Take it to Task Breakdown. →"** → **Page 6 (Task Breakdown)**
   - Notes: ________________________________________________
 
+### Page 4 — Low Energy Bank  *(1 link)*
+- [ ] Top-right: **"↳ Back to Check-In"** → **Page 2 (Check-In)**
+  - Notes: ________________________________________________
+
+### Page 5 — High Energy Bank  *(1 link)*
+- [ ] Top-right: **"↳ Back to Check-In"** → **Page 2 (Check-In)**
+  - Notes: ________________________________________________
+
 ### Page 8 — Why Am I Putting This Off?  *(4 links)*
 - [ ] **"It feels too big → go to the Task Breakdown Sheet"** → **Page 6 (Task Breakdown)**
   - Notes: ________________________________________________
@@ -148,7 +166,7 @@ each link. Pulled directly from the final build's link structure — not the spe
 - [ ] **"I have no energy → pick one tiny thing from the Low Energy Bank"** → **Page 4 (Low Energy Bank)**
   - Notes: ________________________________________________
 
-**Dark PDF subtotal:** 10 nav + 8 content = **18 checks**
+**Dark PDF subtotal:** 10 nav + 10 content = **20 checks**
 
 ---
 

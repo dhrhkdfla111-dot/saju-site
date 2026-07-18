@@ -164,6 +164,8 @@ p  {{ margin:0 0 6px; }}
 .small {{ font-size:{ty['small_px']}px; color:{c['ink_soft']}; }}
 .faint {{ color:{c['ink_faint']}; }}
 .strong {{ font-weight:600; }}
+/* small muted meta field (date / month / week), consistent across pages */
+.meta {{ font-size:16px; color:{c['ink_soft']}; margin:-8px 0 22px; }}
 a.link {{ color:{c['blue_deep']}; text-decoration:none; font-weight:500; }}
 
 /* ---- reusable pieces ---- */
@@ -254,6 +256,18 @@ def writelines(n, width="100%", gap=54):
         for _ in range(n))
 
 
+def blank(w=64):
+    """An inline write-in blank (underline) for the meta date/month fields."""
+    return (f'<span style="display:inline-block;border-bottom:1.6px solid {PAL["line"]};'
+            f'width:{w}px;height:14px;margin:0 5px;vertical-align:baseline"></span>')
+
+
+def meta_field(inner):
+    """A small muted top-of-page meta line (date / month / week). Kept visually
+    identical and near the top across pages for consistency."""
+    return f'<div class="meta">{inner}</div>'
+
+
 def escape_hatch(compact=False):
     """A gentle 'none of these fit' opt-out for the To-Do banks — a blank
     write-in line + a quiet reassurance, matching the guilt-free tone used on the
@@ -327,6 +341,7 @@ def page_checkin(_):
       <a class="back-note" href="#{ck['back_target']}">&#8627; {ck['back_note']}</a>
       <div class="body">
         {page_header("Today's Check-In", "sun", tint="blue")}
+        {meta_field(f'Date: Month {blank(70)} Day {blank(46)} Year {blank(64)} &nbsp;&middot;&nbsp; Day of week: {blank(76)}')}
         <h3>Sleep</h3>
         <div class="row" style="margin:14px 0 26px">{sleep}</div>
         <h3>Energy</h3>
@@ -397,6 +412,7 @@ def _bank(bank, tint):
     half1 = "".join(cols[:2])
     half2 = "".join(cols[2:])
     return f"""
+      <a class="back-note" href="#page-02">&#8627; Back to Check-In</a>
       <div class="body">
         {page_header(bank['title'], "battery", subtitle=bank['subtitle'], tint=tint)}
         <div class="row" style="align-items:flex-start;gap:24px">
@@ -486,14 +502,21 @@ def page_habit(_):
                         for _ in h["days"])
         rows += (f'<tr><td style="border:1px solid {PAL["line"]};width:220px;'
                  'height:96px"></td>' + cells + '</tr>')
-    legend = "".join(
-        f'<div class="row gap" style="margin-right:36px">'
-        f'<span style="width:30px;height:30px;border-radius:50%;'
-        f'background:{PAL[color]}"></span><span>{label}</span></div>'
-        for label, color in h["legend"])
+    def stamp_chip(short, color, txt):
+        return (f'<span style="display:inline-flex;align-items:center;justify-content:center;'
+                f'width:58px;height:58px;border-radius:50%;background:{PAL[color]};'
+                f'color:{txt};font-weight:700;font-size:15px;flex:0 0 auto;'
+                f'border:2px solid rgba(255,255,255,0.55)">{short}</span>')
+    # legend mirrors the actual draggable stickers: colour + short label on the chip
+    legend = (
+        f'<div class="row gap" style="margin-right:44px">'
+        f'{stamp_chip("GOOD", "green", "#ffffff")}<span>GOOD &mdash; did it</span></div>'
+        f'<div class="row gap">'
+        f'{stamp_chip("okay", "lavender", "#4A4770")}<span>it&rsquo;s okay &mdash; didn&rsquo;t</span></div>')
     return f"""
       <div class="body">
         {page_header(h['title'], "grid", subtitle=h['subtitle'], tint="green")}
+        {meta_field(f'Month: {blank(90)} &nbsp;&middot;&nbsp; Week of: {blank(120)}')}
         <table style="width:100%;border-collapse:collapse;text-align:center">
           <tr><th style="padding:14px">Habit</th>{day_head}</tr>{rows}
         </table>
@@ -547,6 +570,7 @@ def page_monthly(_):
     return f"""
       <div class="body">
         {page_header(m['title'], "calendar", tint="blue")}
+        {meta_field(f'Month {blank(120)} , &nbsp;Year {blank(90)}')}
         <h3>{m['goals_label']}</h3>
         <div style="margin:16px 0 8px">{goals}</div>
         <p class="small faint">({m['goals_note']})</p>

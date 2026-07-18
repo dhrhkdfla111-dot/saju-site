@@ -55,14 +55,19 @@ def stamp_html(size, fill, label, glyph, label_color, fs):
     </div></div></body></html>"""
 
 
-def dot_html(size, fill):
+def dot_html(size, fill, label, label_color, fs):
+    """A compact labelled stamp: colour + short text on the sticker itself, so its
+    meaning is clear at a glance (fits a tracker cell without needing the legend)."""
     return f"""<!doctype html><html><head><meta charset=utf-8><style>{FONT_FACE}
       @page {{ size:{size}px {size}px; margin:0; }}
       .wrap {{ width:{size}px; height:{size}px; display:flex; }}
       .circle {{ width:{size-24}px; height:{size-24}px; margin:auto; border-radius:50%;
         background:{fill}; box-shadow:0 6px 16px rgba(60,74,84,0.20);
-        border:{max(3,int(size*0.03))}px solid rgba(255,255,255,0.6); }}
-    </style></head><body><div class="wrap"><div class="circle"></div></div></body></html>"""
+        border:{max(3,int(size*0.03))}px solid rgba(255,255,255,0.6);
+        display:flex; align-items:center; justify-content:center; }}
+      .label {{ color:{label_color}; font-weight:700; font-size:{fs}px; letter-spacing:0.3px; }}
+    </style></head><body><div class="wrap"><div class="circle">
+      <span class="label">{label}</span></div></div></body></html>"""
 
 
 def render_png(html, out, size, scale=2.0):
@@ -80,8 +85,8 @@ render_png(stamp_html(560, GREEN, "GOOD", CHECK.format(s=118), "#ffffff", 84),
            OUT / "good-stamp.png", 560)
 render_png(stamp_html(560, LAV, "it&rsquo;s okay", HEART.format(s=104, c="#ffffff"),
                       "#4A4770", 66), OUT / "okay-stamp.png", 560)
-render_png(dot_html(240, GREEN), OUT / "good-dot.png", 240)
-render_png(dot_html(240, LAV), OUT / "okay-dot.png", 240)
+render_png(dot_html(260, GREEN, "GOOD", "#ffffff", 52), OUT / "good-dot.png", 260)
+render_png(dot_html(260, LAV, "okay", "#4A4770", 52), OUT / "okay-dot.png", 260)
 
 
 # --- sticker sheet (all stamps, for in-app lasso copy) ----------------------
@@ -103,8 +108,9 @@ sheet = f"""<!doctype html><html><head><meta charset=utf-8><style>{FONT_FACE}
     gap:8px; box-shadow:0 10px 26px rgba(60,74,84,0.22); }}
   .label {{ font-weight:700; letter-spacing:0.5px; white-space:nowrap; }}
   .dotrow {{ display:flex; gap:70px; justify-content:center; align-items:center; padding:10px; }}
-  .dot {{ width:120px; height:120px; border-radius:50%; box-shadow:0 6px 16px rgba(60,74,84,0.2);
-    border:4px solid rgba(255,255,255,0.6); }}
+  .dot {{ width:130px; height:130px; border-radius:50%; box-shadow:0 6px 16px rgba(60,74,84,0.2);
+    border:4px solid rgba(255,255,255,0.6); display:flex; align-items:center;
+    justify-content:center; font-weight:700; font-size:28px; }}
   .foot {{ text-align:center; color:{CW['ink_soft']}; font-size:18px; margin-top:26px; }}
 </style></head><body>
   <div class="head"><h1>Habit Stamps</h1>
@@ -116,10 +122,10 @@ sheet = f"""<!doctype html><html><head><meta charset=utf-8><style>{FONT_FACE}
     {cell(LAV, "it&rsquo;s okay", HEART.format(s=56, c="#ffffff"), "#4A4770", 31)}
   </div>
   <div class="dotrow">
-    <div class="dot" style="background:{GREEN}"></div>
-    <div class="dot" style="background:{LAV}"></div>
+    <div class="dot" style="background:{GREEN};color:#ffffff">GOOD</div>
+    <div class="dot" style="background:{LAV};color:#4A4770">okay</div>
   </div>
-  <div class="foot">GOOD (did it) &nbsp;&middot;&nbsp; it&rsquo;s okay (didn&rsquo;t) &nbsp;&middot;&nbsp; Rest counts too.</div>
+  <div class="foot">Compact stamps &mdash; colour + label, sized for a tracker cell. &nbsp;&middot;&nbsp; Rest counts too.</div>
 </body></html>"""
 
 sheet_pdf = OUT / "sticker-sheet.pdf"

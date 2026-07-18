@@ -17,7 +17,7 @@ on iPad (also works in Xodo and most PDF annotation apps).
 | `ADHD-Reset-Planner-Dark.pdf` | Same planner, dark theme (easier on some eyes at night) |
 | `stickers/good-stamp.png` | "GOOD" habit stamp (green) — draggable |
 | `stickers/okay-stamp.png` | "it's okay" habit stamp (lavender) — draggable |
-| `stickers/good-dot.png` · `okay-dot.png` | Small plain dots that fit tracker cells |
+| `stickers/good-dot.png` · `okay-dot.png` | Compact "GOOD" / "okay" stamps (colour + label) sized for tracker cells |
 | `stickers/sticker-sheet.pdf` | All stamps on one page (for lasso-copy inside your app) |
 | `README.md` (this file) | Start-here guide + FAQ |
 
