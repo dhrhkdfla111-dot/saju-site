@@ -109,13 +109,28 @@ def build_flow():
             f'{task_rx+12},{task_cy}"/>')
     loop_label = ('<div class="loop-label" style="left:470px;top:965px">loops back to<br>the right tool</div>')
 
+    # dashed 'back to Check-In' returns from each Energy Bank (routed through the
+    # empty band below Check-In so they don't overlap the solid outbound arrows)
+    BACK = (f'fill="none" stroke="{CW["blue_deep"]}" stroke-width="3" '
+            f'stroke-dasharray="8 7" marker-end="url(#ahb)"')
+    low_by = N["low"][1] + HGT       # 492  (low bank bottom)
+    high_by = N["high"][1] + HGT     # 620  (high bank bottom)
+    cin_bx = N["checkin"][0] + 200   # 350  (arrive near check-in bottom-right)
+    cin_by = N["checkin"][1] + HGT   # 556
+    back = (
+        f'<path {BACK} d="M790,{low_by} C640,545 500,568 {cin_bx},{cin_by+2}"/>'
+        f'<path {BACK} d="M790,{high_by} C610,648 470,600 {cin_bx-32},{cin_by+2}"/>')
+    back_label = ('<div class="back-label" style="left:498px;top:582px">back to Check-In</div>')
+
     svg = (f'<svg class="wires" viewBox="0 0 {W} {H}" width="{W}" height="{H}">'
            f'<defs>'
            f'<marker id="ah" markerWidth="9" markerHeight="9" refX="6.5" refY="3" '
            f'orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="{CW["ink_soft"]}"/></marker>'
            f'<marker id="ahg" markerWidth="9" markerHeight="9" refX="6.5" refY="3" '
            f'orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="{CW["green_deep"]}"/></marker>'
-           f'</defs>{varr}{branch}{loop}</svg>')
+           f'<marker id="ahb" markerWidth="9" markerHeight="9" refX="6.5" refY="3" '
+           f'orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="{CW["blue_deep"]}"/></marker>'
+           f'</defs>{varr}{branch}{loop}{back}</svg>')
 
     html = f"""<!doctype html><html><head><meta charset=utf-8><style>{FONT_FACE}
       @page {{ size:{W}px {H}px; margin:0; }}
@@ -139,13 +154,15 @@ def build_flow():
       .ni-green {{ background:#fff;color:{CW['green_deep']}; }}
       .loop-label {{ position:absolute; font-size:17px; color:{CW['green_deep']};
         font-weight:600; text-align:center; z-index:2; line-height:1.3; }}
+      .back-label {{ position:absolute; font-size:17px; color:{CW['blue_deep']};
+        font-weight:600; text-align:center; z-index:2; }}
       .foot {{ position:absolute; bottom:34px; left:0; right:0; text-align:center;
         font-size:20px; color:{CW['ink_soft']}; }}
     </style></head><body>
       <div class="title"><h1>Tap once. Land exactly where you need.</h1>
         <div class="sub">Every link tested &mdash; no dead ends, no scrolling to find the page.</div>
         <div class="accent"></div></div>
-      {svg}{nodes}{loop_label}
+      {svg}{nodes}{loop_label}{back_label}
       <div class="foot">ADHD Reset Planner &nbsp;&middot;&nbsp; functional hyperlinks, not just page flips</div>
     </body></html>"""
     render_png(html, OUT / "03-hyperlink-flow.png", W, H)
