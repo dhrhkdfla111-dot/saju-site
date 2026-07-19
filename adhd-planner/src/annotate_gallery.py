@@ -105,8 +105,8 @@ def build(kind):
 
     if kind == "checkin":
         r = link_rect(page, "come back to page one")
-        callout(img, ((r[0] + r[2]) / 2, r[3]), (792, 216),
-                "tap to return to the Mindset page anytime", maxw=258)
+        callout(img, ((r[0] + r[2]) / 2, r[3]), (792, 252),
+                "tap to return to the Mindset page anytime", maxw=344)
         r = link_rect(page, "tap for full Low Energy Bank")
         callout(img, ((r[0] + r[2]) / 2, r[3] + 2), (230, 1330),
                 "tap for more options", maxw=340, fs=28)
@@ -121,8 +121,8 @@ def build(kind):
 
     elif kind == "braindump":
         r = link_rect(page, "Take it to Task Breakdown")
-        callout(img, ((r[0] + r[2]) / 2, r[3] + 2), (392, 1360),
-                "tap to start breaking it into steps", maxw=380, fs=28)
+        callout(img, ((r[0] + r[2]) / 2, r[3] + 2), (392, 1356),
+                "tap to start breaking it into steps", maxw=560, fs=28)
         title = "Brain Dump"
         cap = ("Whatever's stuck in your head — write it down, no need to sort it yet. "
                "If something needs sorting, drop it into Urgent / Important / Later. "
