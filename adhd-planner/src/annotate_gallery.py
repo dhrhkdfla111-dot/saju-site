@@ -13,7 +13,7 @@ import fitz
 from PIL import Image, ImageDraw, ImageFont
 
 import config as C
-from howto_images import compose  # reuse the cream-card + caption composer
+from howto_images import compose, check_at  # cream-card composer + hand checkmark
 
 SRC = C.ROOT / "etsy-assets"
 SHOT_DIR = SRC / "screenshots"        # the owner's raw hand-filled screenshots
@@ -26,6 +26,10 @@ SHOTS = {
     "low":       ("KakaoTalk_20260719_215214835.jpg", 3),
     "high":      ("KakaoTalk_20260719_215236274.jpg", 4),
     "breakdown": ("KakaoTalk_20260719_215258576.jpg", 5),
+    "focus":     ("KakaoTalk_20260719_215318627.jpg", 6),
+    "whyputoff": ("KakaoTalk_20260719_215338152.jpg", 7),
+    "reward":    ("KakaoTalk_20260719_215400800.jpg", 9),
+    "thismonth": ("KakaoTalk_20260719_215418053.jpg", 10),
 }
 
 # screenshot px per PDF point
@@ -99,7 +103,7 @@ def callout(img, target, pill_center, label, maxw=360, fs=30):
 
 def build(kind):
     fname, idx = SHOTS[kind]
-    img = Image.open(str(SHOT_DIR / fname)).convert("RGB")
+    img = Image.open(str(SHOT_DIR / fname)).convert("RGBA")
     doc = fitz.open(str(LIGHT))
     page = doc[idx]
 
@@ -143,11 +147,46 @@ def build(kind):
                "write the very first tiny step. That's the only one you do right now — "
                "the rest can wait.")
 
-    out = f"howto-{['checkin','braindump','low','high','breakdown'].index(kind)+1}-{kind}.png"
+    elif kind == "focus":
+        title = "Focus Plan"
+        cap = ("Name what's pulling your attention right now — up to 3 things. If you "
+               "can remove one, do. If not, that's fine too. Then try 25 minutes. No "
+               "pressure, just try.")
+
+    elif kind == "whyputoff":
+        r = link_rect(page, "go to the Task Breakdown Sheet")
+        callout(img, (r[0] + (r[2] - r[0]) * 0.5, r[3]), (842, 286),
+                "the blue text jumps straight to that tool", maxw=316)
+        title = "Why Am I Putting This Off?"
+        cap = ("Pick whichever reason fits today — no need to figure out the “real” "
+               "one. Each reason links straight to the tool that actually helps, so "
+               "you're never stuck wondering what to do next.")
+
+    elif kind == "reward":
+        # per request: check one 'Can't think of one' box so the opt-out feature shows.
+        # Use the Big row (3rd) — empty, so 'save it for later' reads naturally.
+        boxes = page.search_for("Can't think of one")
+        b = boxes[2]                      # Big row
+        cy = (b.y0 + b.y1) / 2 * SY
+        cx = b.x0 * SX - 30               # checkbox sits just left of the text
+        check_at(img, cx, cy, color=(44, 49, 62), size=24, width=6)
+        title = "Reward Chart"
+        cap = ("Decide what you'll give yourself before you even start — small, medium, "
+               "or big. Can't think of anything? Check that box and decide later. "
+               "Rewards aren't something you have to earn.")
+
+    elif kind == "thismonth":
+        title = "This Month"
+        cap = ("Write in the month and year, then just three things you want from it — "
+               "no more. The calendar and note below are yours to use or skip completely.")
+
+    out = f"howto-{list(SHOTS).index(kind)+1}-{kind}.png"
     # overwrite the Round-10 slots with the real-screenshot versions
     names = {"checkin": "howto-1-checkin.png", "braindump": "howto-2-braindump.png",
              "low": "howto-3-low-energy.png", "high": "howto-4-high-energy.png",
-             "breakdown": "howto-5-task-breakdown.png"}
+             "breakdown": "howto-5-task-breakdown.png", "focus": "howto-6-focus.png",
+             "whyputoff": "howto-7-why-putting-off.png", "reward": "howto-8-reward.png",
+             "thismonth": "howto-9-this-month.png"}
     compose(img.convert("RGBA"), title, cap, names[kind])
 
 
