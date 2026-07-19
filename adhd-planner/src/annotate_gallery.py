@@ -65,8 +65,9 @@ def _wrap(draw, text, font, maxw):
     return lines
 
 
-def callout(img, target, pill_center, label, maxw=360, fs=30):
-    """Rounded blue pill with wrapped label + a leader line/arrow to `target`."""
+def callout(img, target, pill_center, label, maxw=360, fs=30, leader=True):
+    """Rounded blue pill with wrapped label. With `leader` (default) also draws a
+    line + arrowhead to `target`; set leader=False for a standalone box."""
     d = ImageDraw.Draw(img)
     font = ImageFont.truetype(PILL_FONT, fs)
     lines = _wrap(d, label, font, maxw)
@@ -78,19 +79,20 @@ def callout(img, target, pill_center, label, maxw=360, fs=30):
     x0, y0 = cx - pw / 2, cy - ph / 2
     x1, y1 = x0 + pw, y0 + ph
 
-    tx, ty = target
-    # leader: from the pill edge nearest the target, to the target point
-    ex = min(max(tx, x0), x1)
-    ey = min(max(ty, y0), y1)
-    d.line([(ex, ey), (tx, ty)], fill=BLUE_INK, width=3)
-    # arrowhead at target
-    import math
-    ang = math.atan2(ty - ey, tx - ex)
-    a = 12
-    d.polygon([(tx, ty),
-               (tx - a * math.cos(ang - 0.5), ty - a * math.sin(ang - 0.5)),
-               (tx - a * math.cos(ang + 0.5), ty - a * math.sin(ang + 0.5))],
-              fill=BLUE_INK)
+    if leader:
+        tx, ty = target
+        # leader: from the pill edge nearest the target, to the target point
+        ex = min(max(tx, x0), x1)
+        ey = min(max(ty, y0), y1)
+        d.line([(ex, ey), (tx, ty)], fill=BLUE_INK, width=3)
+        # arrowhead at target
+        import math
+        ang = math.atan2(ty - ey, tx - ex)
+        a = 12
+        d.polygon([(tx, ty),
+                   (tx - a * math.cos(ang - 0.5), ty - a * math.sin(ang - 0.5)),
+                   (tx - a * math.cos(ang + 0.5), ty - a * math.sin(ang + 0.5))],
+                  fill=BLUE_INK)
     # pill
     d.rounded_rectangle([x0, y0, x1, y1], radius=ph / 2 if len(lines) == 1 else 20,
                         fill=BLUE_BG, outline=BLUE, width=3)
@@ -154,9 +156,8 @@ def build(kind):
                "pressure, just try.")
 
     elif kind == "whyputoff":
-        r = link_rect(page, "go to the Task Breakdown Sheet")
-        callout(img, (r[0] + (r[2] - r[0]) * 0.5, r[3]), (842, 286),
-                "the blue text jumps straight to that tool", maxw=316)
+        callout(img, None, (842, 286),
+                "the blue text jumps straight to that tool", maxw=316, leader=False)
         title = "Why Am I Putting This Off?"
         cap = ("Pick whichever reason fits today — no need to figure out the “real” "
                "one. Each reason links straight to the tool that actually helps, so "
