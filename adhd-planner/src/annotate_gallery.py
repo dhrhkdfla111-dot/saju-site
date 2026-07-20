@@ -103,16 +103,16 @@ def callout(img, target, pill_center, label, maxw=360, fs=30, leader=True):
         yy += lh
 
 
-def build(kind):
+def annotate(kind):
+    """Return (annotated_page_img, title, caption) for one page."""
     fname, idx = SHOTS[kind]
     img = Image.open(str(SHOT_DIR / fname)).convert("RGBA")
     doc = fitz.open(str(LIGHT))
     page = doc[idx]
 
     if kind == "checkin":
-        r = link_rect(page, "come back to page one")
-        callout(img, ((r[0] + r[2]) / 2, r[3]), (792, 252),
-                "tap to return to the Mindset page anytime", maxw=344)
+        callout(img, None, (792, 236),
+                "tap to return to the Mindset page anytime", maxw=344, leader=False)
         r = link_rect(page, "tap for full Low Energy Bank")
         callout(img, ((r[0] + r[2]) / 2, r[3] + 2), (230, 1330),
                 "tap for more options", maxw=340, fs=28)
@@ -181,19 +181,107 @@ def build(kind):
         cap = ("Write in the month and year, then just three things you want from it — "
                "no more. The calendar and note below are yours to use or skip completely.")
 
-    out = f"howto-{list(SHOTS).index(kind)+1}-{kind}.png"
-    # overwrite the Round-10 slots with the real-screenshot versions
-    names = {"checkin": "howto-1-checkin.png", "braindump": "howto-2-braindump.png",
-             "low": "howto-3-low-energy.png", "high": "howto-4-high-energy.png",
-             "breakdown": "howto-5-task-breakdown.png", "focus": "howto-6-focus.png",
-             "whyputoff": "howto-7-why-putting-off.png", "reward": "howto-8-reward.png",
-             "thismonth": "howto-9-this-month.png"}
-    compose(img.convert("RGBA"), title, cap, names[kind])
+    return img, title, cap
+
+
+NAMES = {"checkin": "howto-1-checkin.png", "braindump": "howto-2-braindump.png",
+         "low": "howto-3-low-energy.png", "high": "howto-4-high-energy.png",
+         "breakdown": "howto-5-task-breakdown.png", "focus": "howto-6-focus.png",
+         "whyputoff": "howto-7-why-putting-off.png", "reward": "howto-8-reward.png",
+         "thismonth": "howto-9-this-month.png"}
+
+
+def build(kind):
+    img, title, cap = annotate(kind)
+    compose(img, title, cap, NAMES[kind])
+
+
+# ---------------------------------------------------------------------------
+# Combined Low + High Energy Bank (side-by-side, "Two moods" style)
+# ---------------------------------------------------------------------------
+def _rounded(im, rad):
+    from PIL import ImageDraw as _D
+    mask = Image.new("L", im.size, 0)
+    _D.Draw(mask).rounded_rectangle([0, 0, im.size[0] - 1, im.size[1] - 1], rad, fill=255)
+    out = im.convert("RGBA")
+    out.putalpha(mask)
+    return out
+
+
+def build_combined():
+    from PIL import ImageFilter
+    CREAM = (251, 247, 239)
+    INK = (62, 74, 84)
+    BLUEDEEP = (94, 143, 179)
+    GREEN = (156, 203, 166)
+    LINE = (228, 220, 203)
+
+    low = annotate("low")[0]
+    high = annotate("high")[0]
+    PW = 626
+    ph = int(low.height * PW / low.width)
+    low = low.convert("RGB").resize((PW, ph), Image.LANCZOS)
+    high = high.convert("RGB").resize((PW, ph), Image.LANCZOS)
+
+    pad, gap, title_h = 80, 60, 210
+    caption = ("Browse the full list, sorted by Work, Home, Relationships, and Other. "
+               "Pick one that fits, then head back to your Check-In page to note it "
+               "down. Nothing here feels right? That's okay too — write your own.")
+    W = pad * 2 + PW * 2 + gap
+    cap_font = ImageFont.truetype(str(C.FONTS["medium"]), 27)
+    tmp_d = ImageDraw.Draw(Image.new("RGB", (10, 10)))
+    cap_lines = _wrap(tmp_d, caption, cap_font, W - pad * 2)
+    cap_h = len(cap_lines) * 40 + 50
+    H = title_h + ph + cap_h + pad
+
+    canvas = Image.new("RGBA", (W, H), CREAM + (255,))
+    d = ImageDraw.Draw(canvas)
+
+    # title + subtitle + accent
+    tfont = ImageFont.truetype(str(C.FONTS["bold"]), 54)
+    sfont = ImageFont.truetype(str(C.FONTS["medium"]), 27)
+    title = "Match your energy, not the clock."
+    sub = "Same planner, two lists — pick what matches how you feel today."
+    d.text(((W - d.textlength(title, font=tfont)) / 2, 66), title, font=tfont, fill=INK)
+    d.text(((W - d.textlength(sub, font=sfont)) / 2, 132), sub, font=sfont, fill=BLUEDEEP)
+    d.rounded_rectangle([(W / 2 - 48, 182), (W / 2 + 48, 188)], radius=3, fill=GREEN)
+
+    # two page cards with rounded corners + soft shadow
+    def paste_card(card, x, y, rad=22):
+        shadow = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
+        sb = Image.new("RGBA", (card.width, card.height), (0, 0, 0, 0))
+        ImageDraw.Draw(sb).rounded_rectangle([0, 0, card.width - 1, card.height - 1],
+                                             rad, fill=(60, 74, 84, 80))
+        shadow.paste(sb, (x, y + 16), sb)
+        shadow = shadow.filter(ImageFilter.GaussianBlur(20))
+        canvas.alpha_composite(shadow)
+        rc = _rounded(card, rad)
+        canvas.alpha_composite(rc, (x, y))
+        d.rounded_rectangle([x, y, x + card.width - 1, y + card.height - 1],
+                            rad, outline=LINE, width=2)
+
+    y0 = title_h
+    paste_card(low, pad, y0)
+    paste_card(high, pad + PW + gap, y0)
+
+    # caption
+    cy = y0 + ph + 34
+    for ln in cap_lines:
+        d.text(((W - d.textlength(ln, font=cap_font)) / 2, cy), ln, font=cap_font, fill=BLUEDEEP)
+        cy += 40
+
+    out = SRC / "howto-energy-banks-combined.png"
+    canvas.convert("RGB").save(str(out))
+    canvas.convert("RGB").resize((int(W * 0.4), int(H * 0.4))).save(
+        str(C.BUILD_DIR / "preview" / "hw-combined.png"))
+    print(f"  {out.name}  ({W}x{H})")
 
 
 if __name__ == "__main__":
     which = sys.argv[1] if len(sys.argv) > 1 else "all"
     print("annotating gallery ->", SRC)
+    if which in ("combined", "all"):
+        build_combined()
     for k in SHOTS:
         if which in (k, "all"):
             build(k)
